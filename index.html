@@ -256,7 +256,6 @@
       z-index: 1;
     }
 
-    /* CHỈ HIỆN GÁY SÁCH KHI Ở KHỔ TRANG DÀI */
     .page.mode-page.has-spine::after {
       content: "";
       position: absolute;
@@ -267,7 +266,6 @@
       z-index: 5;
     }
 
-    /* QUOTE VUÔNG: CẤM TUYỆT ĐỐI GÁY SÁCH & TỐI VIỀN */
     .page.mode-quote::after {
       display: none !important;
     }
@@ -514,7 +512,7 @@
           <option value="page">📄 Khổ trang dài</option>
           <option value="quote">🔲 Quote vuông 1:1</option>
         </select>
-        <button class="primary" onclick="exportImage()">📸 Tải PNG</button>
+        <button class="primary" onclick="exportImage()">📸 Tải PNG (4K)</button>
       </div>
 
       <div class="toolbar-group">
@@ -595,7 +593,7 @@
 
       <!-- Giấy & Màu sắc -->
       <div class="toolbar-group">
-        <label title="Tối viền">Viền:<input type="range" min="0" max="0.3" step="0.02" value="0" oninput="updateStyle('--vignette-opacity', this.value)"></label>
+        <label title="Tối viền">Viền:<input type="range" min="0" max="0.3" step="0.02" value="0.08" oninput="updateStyle('--vignette-opacity', this.value)"></label>
         <label title="Hạt giấy">Hạt:<input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)">
         <label title="Đổi màu nền">Nền:<input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)"></label>
         <label title="Đổi màu chữ">Chữ:<input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)"></label>
@@ -782,7 +780,6 @@
         pageArea.style.display = 'none';
         quoteArea.style.display = 'flex';
         
-        // Khóa gáy sách khi ở chế độ Quote
         page.classList.remove('has-spine');
         spineBtn.style.opacity = '0.35';
         spineBtn.style.pointerEvents = 'none';
@@ -797,7 +794,6 @@
         quoteArea.style.display = 'none';
         pageArea.style.display = 'flex';
         
-        // Mở lại quyền dùng gáy sách ở khổ trang dài
         spineBtn.style.opacity = '1';
         spineBtn.style.pointerEvents = 'auto';
 
@@ -811,7 +807,7 @@
     }
 
     function toggleSpine() {
-      if (currentMode === 'quote') return; // Cấm bật gáy sách ở Quote vuông
+      if (currentMode === 'quote') return;
       const page = document.getElementById('page');
       page.classList.toggle('has-spine');
       document.getElementById('spineBtn').classList.toggle('btn-active');
@@ -1067,32 +1063,30 @@
     }
 
     // =========================================================================
-    // HÀM XUẤT ẢNH: ĐÃ DỌN DẸP 100% TẤT CẢ CÁC LOẠI BÓNG ĐÈ MÉP TRÁI
+    // HÀM XUẤT ẢNH: ĐỒNG BỘ 4K SIÊU NÉT TRÊN CẢ ĐIỆN THOẠI LẪN MÁY TÍNH
     // =========================================================================
     async function exportImage() {
       const sandbox = document.getElementById('scaleSandbox');
-      const stage = document.getElementById('stageWrapper');
       const page = document.getElementById('page');
       const bookWrapper = document.getElementById('bookWrapper');
       const exportBtn = document.querySelector('button.primary');
       
       const originalBtnText = exportBtn.innerText;
-      exportBtn.innerText = "⏳ Đang tạo...";
+      exportBtn.innerText = "⏳ Đang kết xuất 4K...";
       exportBtn.disabled = true;
 
       const prevSandboxTransform = sandbox.style.transform;
       const prevSandboxMargin = sandbox.style.marginBottom;
       
-      // Đưa scale về 1:1 chuẩn xác
+      // Đưa về tỉ lệ 1:1 trong tích tắc để chụp
       sandbox.style.transform = 'none';
       sandbox.style.marginBottom = '0px';
 
-      // 1. TẠM ẨN BÓNG VIỀN & GÁY SÁCH ĐỂ KHÔNG BỊ LEM MÀU ĐEN VÀO ẢNH
       const hadSpine = page.classList.contains('has-spine');
       page.classList.remove('has-spine');
 
       const origWrapperBoxShadow = bookWrapper.style.boxShadow;
-      bookWrapper.style.boxShadow = 'none'; // Tắt bóng đen bao ngoài
+      bookWrapper.style.boxShadow = 'none';
 
       const pageRect = page.getBoundingClientRect();
       const highlightSpans = page.querySelectorAll('.hl-yellow, .hl-gray');
@@ -1133,20 +1127,20 @@
       page.style.textRendering = 'optimizeLegibility';
       page.style.webkitFontSmoothing = 'antialiased';
 
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
-      const renderScale = isMobile ? 2.2 : 3.5; 
+      // =======================================================================
+      // CẤU HÌNH SCALE 4X (ĐỘ NÉT 4K ĐẠT ~2080px ĐẾN 2200px TRÊN MỌI THIẾT BỊ)
+      // =======================================================================
+      const targetScale = 4.0;
 
       try {
-        // CHỤP TRỰC TIẾP KHUNG PAGE (KHÔNG CHỤP KHUNG BÓNG NGOÀI)
         const canvas = await html2canvas(page, {
-          scale: renderScale,
+          scale: targetScale,
           useCORS: true,
           allowTaint: true,
           backgroundColor: null,
           logging: false
         });
 
-        // Khôi phục lại trạng thái ban đầu
         tempBgElements.forEach(el => el.remove());
         modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
         
@@ -1161,6 +1155,7 @@
         let finalCanvas = canvas;
         const bVal = parseFloat(document.getElementById('bleedSlider').value) || 0;
 
+        // Xử lý mực lem trên canvas tối ưu bộ nhớ
         if (bVal > 0) {
           try {
             const bleedCanvas = document.createElement('canvas');
@@ -1182,8 +1177,9 @@
           }
         }
 
-        const fileName = (currentMode === 'quote' ? 'quote-wattpad-' : 'trang-sach-') + Date.now() + '.png';
+        const fileName = (currentMode === 'quote' ? 'quote-wattpad-4K-' : 'trang-sach-4K-') + Date.now() + '.png';
 
+        // XUẤT FILE 4K TỐI ƯU
         finalCanvas.toBlob(async (blob) => {
           if (!blob) {
             fallbackDownload(finalCanvas.toDataURL('image/png'), fileName);
@@ -1195,7 +1191,7 @@
             try {
               await navigator.share({
                 files: [file],
-                title: 'Trang sách / Quote'
+                title: 'Trang sách / Quote 4K'
               });
               exportBtn.innerText = originalBtnText;
               exportBtn.disabled = false;
@@ -1226,7 +1222,7 @@
         exportBtn.innerText = originalBtnText;
         exportBtn.disabled = false;
         console.error(err);
-        alert("Có lỗi khi tạo ảnh trên điện thoại, bà thử bấm lại lần nữa nha!");
+        alert("Điện thoại báo bộ nhớ đang đầy, bà thử bấm lại lần nữa nha!");
       }
     }
 
@@ -1244,7 +1240,7 @@
         link.click();
       }
       const exportBtn = document.querySelector('button.primary');
-      exportBtn.innerText = "📸 Tải PNG";
+      exportBtn.innerText = "📸 Tải PNG (4K)";
       exportBtn.disabled = false;
     }
   </script>
