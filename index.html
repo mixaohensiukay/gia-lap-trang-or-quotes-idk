@@ -23,23 +23,19 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
-    /* ========================================================================= */
-    /* HỆ THỐNG MÀU SẮC (THEME SKINS): MẶC ĐỊNH LÀ PASTEL XANH DƯƠNG XINH LUNG LINH */
-    /* ========================================================================= */
     :root {
       /* Theme Pastel Blue (Mặc định) */
-      --ui-bg: #eaf2f8;                      /* Nền web xanh mây trời pastel */
-      --ui-toolbar-bg: rgba(255, 255, 255, 0.85); /* Thanh công cụ kính mờ trắng trong */
-      --ui-border: #cfe0ee;                  /* Viền xanh phấn êm dịu */
-      --ui-card-bg: #f3f8fc;                 /* Nền nút bấm pastel */
+      --ui-bg: #eaf2f8;
+      --ui-toolbar-bg: rgba(255, 255, 255, 0.85);
+      --ui-border: #cfe0ee;
+      --ui-card-bg: #f3f8fc;
       --ui-card-hover: #e2edf6;
-      --ui-text-main: #24384d;               /* Màu chữ xanh than sang trọng */
+      --ui-text-main: #24384d;
       --ui-text-muted: #5e7994;
-      --ui-accent: #3b82f6;                  /* Xanh dương chủ đạo */
+      --ui-accent: #3b82f6;
       --ui-accent-hover: #2563eb;
       --ui-shadow: 0 10px 30px rgba(59, 130, 246, 0.12);
 
-      /* Thông số trang sách giấy */
       --paper-cream: #f7f4ec;
       --custom-bg: #f7f4ec;
       --custom-text: #1c1b1a;
@@ -51,7 +47,6 @@
       --vignette-opacity: 0.08;
     }
 
-    /* Theme Dark Studio (Dành cho ai thích viết đêm) */
     body.theme-dark {
       --ui-bg: #121214;
       --ui-toolbar-bg: rgba(26, 26, 32, 0.9);
@@ -80,7 +75,6 @@
       transition: background-color 0.3s ease;
     }
 
-    /* THANH CÔNG CỤ KÍNH MỜ PASTEL (GLASSMORPHISM) */
     .toolbar-container {
       width: 100%;
       position: sticky;
@@ -119,13 +113,8 @@
       }
     }
 
-    .toolbar::-webkit-scrollbar {
-      height: 4px;
-    }
-    .toolbar::-webkit-scrollbar-thumb {
-      background: var(--ui-border);
-      border-radius: 4px;
-    }
+    .toolbar::-webkit-scrollbar { height: 4px; }
+    .toolbar::-webkit-scrollbar-thumb { background: var(--ui-border); border-radius: 4px; }
 
     .toolbar-group {
       display: inline-flex;
@@ -170,7 +159,6 @@
       overflow: hidden;
     }
 
-    /* STEPPERS BẤM SỐ XINH XẮN */
     .num-stepper {
       display: inline-flex;
       align-items: center;
@@ -205,14 +193,8 @@
       cursor: pointer;
     }
 
-    .num-stepper button:hover {
-      background: var(--ui-card-hover);
-    }
-
-    .num-stepper button:active {
-      background: var(--ui-accent);
-      color: #fff;
-    }
+    .num-stepper button:hover { background: var(--ui-card-hover); }
+    .num-stepper button:active { background: var(--ui-accent); color: #fff; }
 
     .num-stepper input[type="number"] {
       width: 38px;
@@ -234,7 +216,6 @@
       margin: 0;
     }
 
-    /* NÚT TẢI ẢNH NỔI BẬT */
     .toolbar button.primary {
       background: var(--ui-accent);
       border-color: var(--ui-accent);
@@ -243,9 +224,7 @@
       padding: 6px 14px;
       box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
     }
-    .toolbar button.primary:hover { 
-      background: var(--ui-accent-hover); 
-    }
+    .toolbar button.primary:hover { background: var(--ui-accent-hover); }
 
     .btn-active {
       background: var(--ui-accent) !important;
@@ -271,7 +250,6 @@
       padding: 6px 9px !important;
     }
 
-    /* VÙNG DANH SÁCH CÁC TRANG */
     .viewport {
       width: 100%;
       display: flex;
@@ -339,9 +317,7 @@
       border-color: rgba(94, 121, 148, 0.4);
       pointer-events: none;
     }
-    body.theme-dark .crop-mark {
-      border-color: rgba(255, 255, 255, 0.22);
-    }
+    body.theme-dark .crop-mark { border-color: rgba(255, 255, 255, 0.22); }
     .crop-tl { top: 0; left: 0; border-top: 1.5px solid; border-left: 1.5px solid; }
     .crop-tr { top: 0; right: 0; border-top: 1.5px solid; border-right: 1.5px solid; }
     .crop-bl { bottom: 0; left: 0; border-bottom: 1.5px solid; border-left: 1.5px solid; }
@@ -352,9 +328,7 @@
       border-radius: 4px;
       box-shadow: 0 16px 40px rgba(36, 56, 77, 0.18);
     }
-    body.theme-dark .book-wrapper {
-      box-shadow: 0 16px 44px rgba(0,0,0,0.7);
-    }
+    body.theme-dark .book-wrapper { box-shadow: 0 16px 44px rgba(0,0,0,0.7); }
 
     .page {
       background-color: var(--custom-bg);
@@ -640,9 +614,12 @@
         <button class="primary" style="background:#10b981;border-color:#059669;" onclick="exportAllPages()">📦 Tải TẤT CẢ trang</button>
       </div>
 
-      <!-- Nhóm 2: Skin giao diện, Dự án & Thêm trang mới -->
+      <!-- Nhóm 2: Skin giao diện, Dự án, Undo/Redo & Thêm trang mới -->
       <div class="toolbar-group">
-        <!-- NÚT CHUYỂN SKIN PASTEL BLUE / DARK STUDIO -->
+        <!-- CẶP NÚT UNDO / REDO (HOÀN TÁC / LÀM LẠI) TIỆN DỤNG -->
+        <button class="prevent-lose-focus" onclick="execUndo()" title="Hoàn tác thao tác trước (Ctrl + Z)" style="font-size:15px;font-weight:bold;padding:6px 11px;">↩</button>
+        <button class="prevent-lose-focus" onclick="execRedo()" title="Làm lại thao tác sau (Ctrl + Y)" style="font-size:15px;font-weight:bold;padding:6px 11px;">↪</button>
+        
         <button onclick="toggleThemeSkin()" id="themeSkinBtn" title="Đổi giao diện Pastel Xanh / Dark Studio" style="font-weight: 600;">🎨 Skin Xanh</button>
         <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
         <button onclick="addNewPage()" title="Thêm một trang mới nằm tiếp theo phía dưới" style="font-weight:bold;color:var(--ui-accent);">➕ Thêm Trang</button>
@@ -840,11 +817,36 @@
     let currentMode = 'page';
     let nextFootnoteNumber = 3;
     let pageCount = 1;
-    let currentSkin = 'pastel'; // Mặc định là pastel xanh mây trời
+    let currentSkin = 'pastel';
 
     // =========================================================================
-    // TÍNH NĂNG CHUYỂN SKIN GIAO DIỆN (PASTEL BLUE / DARK STUDIO)
+    // TÍNH NĂNG HOÀN TÁC (UNDO) VÀ LÀM LẠI (REDO)
     // =========================================================================
+    function execUndo() {
+      document.execCommand('undo', false, null);
+    }
+
+    function execRedo() {
+      document.execCommand('redo', false, null);
+    }
+
+    // BẮT PHÍM TẮT BÀN PHÍM CHUẨN: CTRL + Z VÀ CTRL + Y (HOẶC CTRL + SHIFT + Z)
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          execRedo();
+        } else {
+          e.preventDefault();
+          execUndo();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        execRedo();
+      }
+    });
+
+    // CHUYỂN SKIN GIAO DIỆN
     function toggleThemeSkin() {
       const body = document.body;
       const btn = document.getElementById('themeSkinBtn');
