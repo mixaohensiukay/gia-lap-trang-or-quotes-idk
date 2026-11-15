@@ -282,8 +282,8 @@
 
     .stage-wrapper.active-page {
       outline: 2px dashed var(--ui-accent);
-      outline-offset: 4px;
-      border-radius: 8px;
+      outline-offset: 6px;
+      border-radius: 10px;
     }
 
     .page-control-bar {
@@ -309,19 +309,6 @@
       color: #ff8888 !important;
       border: 1px solid #5a2e2e !important;
     }
-
-    .crop-mark {
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      border-color: rgba(94, 121, 148, 0.4);
-      pointer-events: none;
-    }
-    body.theme-dark .crop-mark { border-color: rgba(255, 255, 255, 0.22); }
-    .crop-tl { top: 0; left: 0; border-top: 1.5px solid; border-left: 1.5px solid; }
-    .crop-tr { top: 0; right: 0; border-top: 1.5px solid; border-right: 1.5px solid; }
-    .crop-bl { bottom: 0; left: 0; border-bottom: 1.5px solid; border-left: 1.5px solid; }
-    .crop-br { bottom: 0; right: 0; border-bottom: 1.5px solid; border-right: 1.5px solid; }
 
     .book-wrapper {
       background: #111;
@@ -745,11 +732,6 @@
             <button class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
           </div>
 
-          <span class="crop-mark crop-tl"></span>
-          <span class="crop-mark crop-tr"></span>
-          <span class="crop-mark crop-bl"></span>
-          <span class="crop-mark crop-br"></span>
-
           <div class="book-wrapper">
             <div class="page mode-page font-garamond" spellcheck="false">
               <div class="page-grain"></div>
@@ -969,11 +951,6 @@
             <span>TRANG ${pageCount}</span>
             <button class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
           </div>
-
-          <span class="crop-mark crop-tl"></span>
-          <span class="crop-mark crop-tr"></span>
-          <span class="crop-mark crop-bl"></span>
-          <span class="crop-mark crop-br"></span>
 
           <div class="book-wrapper">
             <div class="page mode-${currentMode} ${currentFont}" spellcheck="false">
@@ -1327,10 +1304,6 @@
                   <span>TRANG ${pageCount}</span>
                   <button class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
                 </div>
-                <span class="crop-mark crop-tl"></span>
-                <span class="crop-mark crop-tr"></span>
-                <span class="crop-mark crop-bl"></span>
-                <span class="crop-mark crop-br"></span>
                 <div class="book-wrapper">
                   ${pData.html}
                 </div>
