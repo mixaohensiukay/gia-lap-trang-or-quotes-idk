@@ -44,6 +44,7 @@
       overflow-x: hidden;
     }
 
+    /* THANH TOOLBAR THIẾT KẾ LAI: MOBILE THÌ CUỘN VUỐT NGANG, PC THÌ MỞ BUNG GỌN GÀNG */
     .toolbar-container {
       width: 100%;
       position: sticky;
@@ -52,6 +53,8 @@
       background: #18181c;
       border-bottom: 1px solid #2d2d38;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
     }
 
     .toolbar {
@@ -59,14 +62,32 @@
       gap: 8px;
       align-items: center;
       padding: 10px 14px;
+      width: 100%;
+      max-width: 1440px;
       overflow-x: auto;
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
+      scrollbar-width: thin;
+      scrollbar-color: #3f3f4c transparent;
+    }
+
+    /* TỐI ƯU CHO PC (MÀN HÌNH RỘNG): TỰ BUNG TẤT CẢ TÍNH NĂNG KHÔNG CẦN KÉO CHUỘT */
+    @media (min-width: 1024px) {
+      .toolbar {
+        flex-wrap: wrap;
+        white-space: normal;
+        justify-content: center;
+        overflow-x: visible;
+        padding: 10px 20px;
+      }
     }
 
     .toolbar::-webkit-scrollbar {
-      display: none;
+      height: 4px;
+    }
+    .toolbar::-webkit-scrollbar-thumb {
+      background: #3f3f4c;
+      border-radius: 4px;
     }
 
     .toolbar-group {
@@ -138,6 +159,10 @@
       padding: 0;
       border-radius: 0;
       cursor: pointer;
+    }
+
+    .num-stepper button:hover {
+      background: #3f3f4c;
     }
 
     .num-stepper button:active {
@@ -506,7 +531,8 @@
   </svg>
 
   <div class="toolbar-container">
-    <div class="toolbar">
+    <div class="toolbar" id="mainToolbar">
+      <!-- Nhóm 1: Chế độ & Xuất ảnh -->
       <div class="toolbar-group">
         <select id="modeSelect" class="highlight-select" onchange="switchMode(this.value)">
           <option value="page">📄 Khổ trang dài</option>
@@ -515,6 +541,7 @@
         <button class="primary" onclick="exportImage()">📸 Tải PNG (4K)</button>
       </div>
 
+      <!-- Nhóm 2: Dự án & Lề -->
       <div class="toolbar-group">
         <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
         <button onclick="nextPage()" title="Tăng số trang và sang trang mới">📄 Trang Mới</button>
@@ -522,7 +549,7 @@
         <button class="prevent-lose-focus" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold; background: #3b3a4a;">⇥ Tab</button>
       </div>
 
-      <!-- Cỡ chữ & Giãn dòng -->
+      <!-- Nhóm 3: Cỡ chữ & Giãn dòng -->
       <div class="toolbar-group">
         <div class="num-stepper" title="Cỡ chữ">
           <span class="stepper-label">Cỡ</span>
@@ -553,7 +580,7 @@
         </div>
       </div>
 
-      <!-- Hiệu ứng chữ -->
+      <!-- Nhóm 4: Hiệu ứng chữ Studio -->
       <div class="toolbar-group">
         <div class="num-stepper" title="Mực lem xơ giấy">
           <span class="stepper-label">Lem</span>
@@ -591,17 +618,14 @@
         </div>
       </div>
 
-      <!-- Giấy & Màu sắc -->
+      <!-- Nhóm 5: Giấy, Màu sắc & Font -->
       <div class="toolbar-group">
-        <label title="Tối viền">Viền:<input type="range" min="0" max="0.3" step="0.02" value="0.08" oninput="updateStyle('--vignette-opacity', this.value)"></label>
-        <label title="Hạt giấy">Hạt:<input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)">
+        <label title="Tối viền">Viền:<input type="range" min="0" max="0.3" step="0.02" value="0.08" oninput="updateStyle('--vignette-opacity', this.value)" style="width:42px;height:5px;cursor:ew-resize;"></label>
+        <label title="Hạt giấy">Hạt:<input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)" style="width:42px;height:5px;cursor:ew-resize;"></label>
         <label title="Đổi màu nền">Nền:<input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)"></label>
         <label title="Đổi màu chữ">Chữ:<input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)"></label>
         <button onclick="setCustomText('#263b72')" style="color: #60a5fa; font-weight: bold;">#263b72</button>
-      </div>
-
-      <!-- Font chữ -->
-      <div class="toolbar-group">
+        
         <select id="fontSelect" onchange="changeFont(this.value)">
           <option value="font-alegreya">Alegreya (Thơ mộng)</option>
           <option value="font-stix">STIX Two Text (Sắc sảo)</option>
@@ -614,7 +638,7 @@
         </select>
       </div>
 
-      <!-- CĂN LỀ & BỘ HIGHLIGHT KÈM NÚT XÓA ĐỊNH DẠNG -->
+      <!-- Nhóm 6: Căn lề & Highlight -->
       <div class="toolbar-group">
         <button class="btn-icon prevent-lose-focus" onclick="formatDoc('justifyFull')" title="Căn đều">≡</button>
         <button class="btn-icon prevent-lose-focus" onclick="formatDoc('justifyCenter')" title="Căn giữa">≗</button>
@@ -624,8 +648,6 @@
         <button class="prevent-lose-focus" onclick="toggleFormatSpan('hl-yellow')">Vàng</button>
         <button class="prevent-lose-focus" onclick="toggleFormatSpan('hl-gray')">Xám</button>
         <button class="prevent-lose-focus" onclick="toggleFormatSpan('pencil-underline')">〰 Gạch đỏ</button>
-        
-        <!-- NÚT TẨY XÓA ĐỊNH DẠNG RIÊNG BIỆT DÀNH CHO MOBILE -->
         <button class="prevent-lose-focus" onclick="clearHighlightFormatting()" title="Xóa toàn bộ màu Highlight & Gạch đỏ" style="background: #472a2a; border-color: #6e3535; color: #ff9b9b; font-weight: bold;">🧹 Xóa màu</button>
         
         <button class="prevent-lose-focus" onclick="insertFootnoteMark()">Chú thích (¹)</button>
@@ -708,8 +730,20 @@
     let nextFootnoteNumber = 3;
 
     // =========================================================================
-    // KHÓA CHỐNG MẤT CON TRỎ CHUỘT / MẤT BÔI ĐEN TRÊN MÀN HÌNH ĐIỆN THOẠI
+    // TỰ ĐỘNG CHUYỂN CON LĂN CHUỘT DỌC THÀNH CUỘN NGANG KHI Ở TRÊN THANH CÔNG CỤ PC
     // =========================================================================
+    const toolbarEl = document.getElementById('mainToolbar');
+    if (toolbarEl) {
+      toolbarEl.addEventListener('wheel', (e) => {
+        // Chỉ kích hoạt khi màn hình đang có thanh cuộn ngang
+        if (toolbarEl.scrollWidth > toolbarEl.clientWidth) {
+          e.preventDefault();
+          toolbarEl.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+    }
+
+    // KHÓA CHỐNG MẤT CON TRỎ CHUỘT / MẤT BÔI ĐEN TRÊN MÀN HÌNH ĐIỆN THOẠI
     document.querySelectorAll('.prevent-lose-focus').forEach(btn => {
       btn.addEventListener('pointerdown', e => e.preventDefault());
       btn.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
@@ -911,9 +945,6 @@
       autoSavePreset();
     }
 
-    // =========================================================================
-    // HÀM BẬT/TẮT ĐỊNH DẠNG TƯƠNG THÍCH HOÀN TOÀN VỚI MÀN HÌNH ĐIỆN THOẠI
-    // =========================================================================
     function toggleFormatSpan(className) {
       const selection = window.getSelection();
       if (!selection.rangeCount) return;
@@ -922,11 +953,9 @@
       let container = range.commonAncestorContainer;
       if (container.nodeType === 3) container = container.parentElement;
 
-      // Tìm xem có đang nằm trong thẻ định dạng này không
       const targetSpan = container.closest('.' + className);
 
       if (targetSpan) {
-        // Gỡ bỏ định dạng
         const parent = targetSpan.parentNode;
         while (targetSpan.firstChild) {
           parent.insertBefore(targetSpan.firstChild, targetSpan);
@@ -935,7 +964,6 @@
         selection.removeAllRanges();
       } else {
         if (selection.isCollapsed) return;
-        // Bọc thẻ định dạng mới
         const span = document.createElement("span");
         span.className = className;
         span.appendChild(range.extractContents());
@@ -944,9 +972,6 @@
       autoSavePreset();
     }
 
-    // =========================================================================
-    // NÚT TẨY XÓA MỌI LOẠI HIGHLIGHT VÀ GẠCH ĐỎ (DÙNG ĐƯỢC CẢ KHI CHƯA KỊP BÔI ĐEN)
-    // =========================================================================
     function clearHighlightFormatting() {
       const selection = window.getSelection();
       if (!selection.rangeCount) return;
@@ -955,7 +980,6 @@
       let container = range.commonAncestorContainer;
       if (container.nodeType === 3) container = container.parentElement;
 
-      // 1. Nếu người dùng đang đặt con trỏ chuột bên trong một từ có màu
       const directTarget = container.closest('.hl-yellow, .hl-gray, .pencil-underline');
       if (directTarget) {
         const parent = directTarget.parentNode;
@@ -967,7 +991,6 @@
         return;
       }
 
-      // 2. Nếu người dùng đang bôi đen một đoạn dài
       if (!selection.isCollapsed) {
         const fragment = range.cloneContents();
         const spans = fragment.querySelectorAll('.hl-yellow, .hl-gray, .pencil-underline');
@@ -980,7 +1003,6 @@
           range.deleteContents();
           range.insertNode(fragment);
         } else {
-          // Thao tác quét gỡ bao trùm
           let parentSpan = container.closest('.hl-yellow, .hl-gray, .pencil-underline');
           if (parentSpan) {
             const p = parentSpan.parentNode;
