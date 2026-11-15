@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="vi" spellcheck="false">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trình Tạo Trang Sách & Quote Giả Lập</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400..800&family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Cinzel:wght@500;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --bg-editor: #121214;
+      --paper-cream: #f7f4ec;
+      --paper-aged: #eee5d3;
+      --paper-typewriter: #fdfbf7;
+      --paper-dark: #191817;
+      
+      --custom-bg: #f7f4ec;
+      --custom-text: #1c1b1a;
+      --font-size: 17.5px;
+      --line-height: 1.55;
+      --letter-spacing: 0px;
+      --text-indent: 1.6em;
+
+      --grain-opacity: 0.045;
+      --vignette-opacity: 0.08;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--bg-editor);
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #e5e5e5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px 12px 60px;
+      min-height: 100vh;
+    }
+
+    .toolbar {
+      background: #1c1c20;
+      border: 1px solid #32323a;
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.6);
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      max-width: 1400px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      color: #ddd;
+      border-right: 1px solid #33333d;
+      padding-right: 7px;
+    }
+
+    .toolbar-group:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+
+    .toolbar select, .toolbar button, .toolbar input[type="range"], .toolbar input[type="color"] {
+      background: #2a2a32;
+      color: #fff;
+      border: 1px solid #40404c;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .toolbar input[type="color"] {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    .toolbar input[type="range"] {
+      padding: 0;
+      height: 5px;
+      width: 44px;
+      cursor: ew-resize;
+    }
+
+    .toolbar button:hover { background: #3b3b47; }
+    .toolbar button.primary {
+      background: #2563eb;
+      border-color: #1d4ed8;
+      font-weight: 600;
+    }
+    .toolbar button.primary:hover { background: #1d4ed8; }
+
+    .btn-active {
+      background: #4f46e5 !important;
+      border-color: #6366f1 !important;
+      font-weight: bold;
+      color: #fff !important;
+    }
+
+    .highlight-select {
+      background: #4338ca !important;
+      font-weight: bold;
+      border-color: #6366f1 !important;
+    }
+
+    .btn-icon {
+      font-size: 13px;
+      padding: 5px 8px !important;
+    }
+
+    .viewport {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      padding-bottom: 20px;
+    }
+
+    .stage-wrapper {
+      position: relative;
+      padding: 14px;
+    }
+
+    .crop-mark {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-color: rgba(255, 255, 255, 0.22);
+      pointer-events: none;
+    }
+    .crop-tl { top: 0; left: 0; border-top: 1.5px solid; border-left: 1.5px solid; }
+    .crop-tr { top: 0; right: 0; border-top: 1.5px solid; border-right: 1.5px solid; }
+    .crop-bl { bottom: 0; left: 0; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+    .crop-br { bottom: 0; right: 0; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+    .book-wrapper {
+      background: #111;
+      border-radius: 4px;
+      box-shadow: 0 16px 44px rgba(0,0,0,0.7);
+      transform-origin: top center;
+      transition: transform 0.15s ease-out;
+    }
+
+    .page {
+      background-color: var(--custom-bg);
+      color: var(--custom-text);
+      position: relative;
+      box-shadow: inset 0 0 60px rgba(0,0,0,0.04), 0 2px 12px rgba(0,0,0,0.18);
+      transition: background-color 0.2s ease, width 0.3s ease, height 0.3s ease;
+      overflow: hidden;
+    }
+
+    .page-grain {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(#111 0.45px, transparent 0.45px);
+      background-size: 5px 5px;
+      opacity: var(--grain-opacity);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .page-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.25) 100%);
+      opacity: var(--vignette-opacity);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .page.has-spine::after {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 40px;
+      background: linear-gradient(to right, rgba(0,0,0,0.16) 0%, rgba(0,0,0,0.05) 50%, transparent 100%);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* MỞ RỘNG TOÀN BỘ KHÔNG GIAN BÓNG CHỮ ĐỂ KHÔNG BỊ CẮT XÉN */
+    #pageLayoutArea, #quoteLayoutArea {
+      position: relative;
+      z-index: 4;
+      overflow: visible !important;
+    }
+
+    .page.mode-page {
+      width: 550px;
+      min-height: 760px;
+      padding: 44px 50px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .page.mode-quote {
+      width: 520px;
+      height: 520px;
+      min-height: 520px;
+      max-height: 520px;
+      padding: 38px 40px 38px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      aspect-ratio: 1 / 1;
+    }
+
+    .font-alegreya { font-family: 'Alegreya', serif; }
+    .font-stix { font-family: 'STIX Two Text', serif; }
+    .font-garamond { font-family: 'EB Garamond', serif; }
+    .font-lora { font-family: 'Lora', serif; }
+    .font-literata { font-family: 'Literata', serif; }
+    .font-courier { font-family: 'Courier Prime', monospace; }
+    .font-vietnam { font-family: 'Be Vietnam Pro', sans-serif; }
+    .font-helvetica { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-style: italic;
+      font-size: 13px;
+      margin-bottom: 22px;
+      opacity: 0.75;
+      border-bottom: 0.5px solid currentColor;
+      padding-bottom: 6px;
+    }
+    .page-header div { outline: none; }
+
+    .chapter-heading-box { text-align: center; margin: 10px 0 32px 0; outline: none; }
+    .chapter-num {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 8px;
+    }
+    .chapter-title {
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      font-style: italic;
+      line-height: 1.25;
+    }
+    .chapter-divider {
+      width: 40px;
+      height: 1px;
+      background: currentColor;
+      opacity: 0.4;
+      margin: 14px auto 0;
+    }
+
+    .page-body {
+      font-size: var(--font-size);
+      line-height: var(--line-height);
+      letter-spacing: var(--letter-spacing);
+      text-align: justify;
+      text-justify: inter-word;
+      outline: none;
+      overflow: visible !important;
+      padding: 0 4px;
+    }
+    .page-body p { text-indent: var(--text-indent); margin-bottom: 3px; }
+    .page-body p[style*="text-align: center"],
+    .page-body div[style*="text-align: center"],
+    .page-body [style*="center"],
+    .scene-break {
+      text-indent: 0 !important;
+    }
+
+    .scene-break {
+      text-align: center;
+      letter-spacing: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .dropcap {
+      float: left;
+      font-size: 3.4em;
+      line-height: 0.75;
+      padding-top: 4px;
+      padding-right: 8px;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    p.has-dropcap { text-indent: 0 !important; }
+
+    .footnotes {
+      margin-top: 26px;
+      padding-top: 8px;
+      position: relative;
+      width: 100%;
+      font-size: 13px;
+      line-height: 1.38;
+      font-style: italic;
+      outline: none;
+      text-align: justify;
+      opacity: 0.9;
+    }
+    .footnotes::before {
+      content: "";
+      display: block;
+      width: 75px;
+      height: 0.8px;
+      background: currentColor;
+      opacity: 0.6;
+      margin-bottom: 8px;
+    }
+    .footnotes div { margin-bottom: 2px; text-indent: 0; }
+    .page-number { text-align: center; margin-top: 16px; font-size: 14px; outline: none; opacity: 0.8; }
+
+    .quote-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      overflow: visible !important;
+    }
+    
+    .quote-mark {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 700;
+      font-size: 64px;
+      line-height: 0.75;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: currentColor;
+      opacity: 0.62;
+      user-select: none;
+      margin-top: 2px;
+      margin-bottom: 12px;
+    }
+
+    /* ĐÃ FIX: MỞ RỘNG KHÔNG GIAN BÓNG CHỮ VÀ ĐỆM AN TOÀN 2 BÊN */
+    .quote-content {
+      font-size: var(--font-size);
+      line-height: var(--line-height);
+      letter-spacing: var(--letter-spacing);
+      font-style: normal;
+      outline: none;
+      margin: auto 0;
+      width: 100%;
+      text-align: center;
+      overflow: visible !important; /* Không bao giờ cắt bóng chữ hay đuôi chữ nghiêng */
+      padding: 4px 10px; /* Khoảng thở an toàn 2 bên mép chữ */
+    }
+    
+    .quote-footer { width: 100%; outline: none; text-align: center; overflow: visible !important; }
+    .quote-divider {
+      width: 40px;
+      height: 1px;
+      background: currentColor;
+      opacity: 0.35;
+      margin: 0 auto 10px;
+    }
+    .quote-title {
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+      opacity: 0.9;
+    }
+    .quote-sub { font-size: 12px; opacity: 0.65; margin-top: 4px; font-style: italic; }
+
+    .pencil-underline {
+      text-decoration: underline wavy #b91c1c 1.2px;
+      text-underline-offset: 4px;
+    }
+    .hl-gray { 
+      background-color: rgba(180, 180, 180, 0.45); 
+      padding: 1px 3px;
+    }
+    .hl-yellow { 
+      background-color: rgba(250, 204, 21, 0.55); 
+      padding: 1px 3px;
+    }
+
+    .temp-hl-bg {
+      position: absolute;
+      z-index: 2;
+      pointer-events: none;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body spellcheck="false">
+
+  <!-- SVG FILTER CONVERGE AI -->
+  <svg style="position: absolute; width: 0; height: 0; pointer-events: none; opacity: 0;" aria-hidden="true">
+    <defs>
+      <filter id="ink-bleed-filter" x="-12%" y="-12%" width="124%" height="124%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="6" result="noise" />
+        <feDisplacementMap id="feDispPreview" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+
+      <filter id="ink-bleed-filter-4k" x="-12%" y="-12%" width="124%" height="124%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.22" numOctaves="2" seed="6" result="noise" />
+        <feDisplacementMap id="feDispCanvas" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="toolbar">
+    <div class="toolbar-group">
+      <select id="modeSelect" class="highlight-select" onchange="switchMode(this.value)">
+        <option value="page">📄 Khổ trang dài</option>
+        <option value="quote">🔲 Quote vuông 1:1</option>
+      </select>
+    </div>
+
+    <div class="toolbar-group">
+      <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
+      <button onclick="nextPage()" title="Tăng số trang và sang trang mới">📄 Trang Mới</button>
+      <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D">📖 Gáy 3D</button>
+    </div>
+
+    <!-- BỘ 5 THANH TRƯỢT HIỆU ỨNG CHỮ -->
+    <div class="toolbar-group">
+      <label title="Kéo độ mực lem thớ giấy">Lem:
+        <input type="range" id="bleedSlider" min="0" max="4.0" step="0.2" value="0" oninput="applyAllTextEffects()">
+      </label>
+      <label title="Kéo độ đổ bóng mềm mại">Bóng:
+        <input type="range" id="shadowSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()">
+      </label>
+      <label title="Kéo độ đẫm mực bút máy">Ướt:
+        <input type="range" id="wetSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()">
+      </label>
+      <label title="Kéo độ dập chìm nhẹ">Ép:
+        <input type="range" id="pressSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()">
+      </label>
+      <label title="Kéo quầng sáng hào quang">Quang:
+        <input type="range" id="glowSlider" min="0" max="15" step="0.5" value="0" oninput="applyAllTextEffects()">
+      </label>
+    </div>
+
+    <!-- Bề mặt giấy -->
+    <div class="toolbar-group">
+      <label title="Độ tối 4 góc trang sách">Tối viền:
+        <input type="range" min="0" max="0.3" step="0.02" value="0.08" oninput="updateStyle('--vignette-opacity', this.value)">
+      </label>
+      <label title="Độ sần hạt giấy">Hạt:
+        <input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)">
+      </label>
+    </div>
+
+    <!-- Font chữ -->
+    <div class="toolbar-group">
+      <select id="fontSelect" onchange="changeFont(this.value)">
+        <option value="font-alegreya">Alegreya (Thơ mộng)</option>
+        <option value="font-stix">STIX Two Text (Sắc sảo)</option>
+        <option value="font-garamond" selected>EB Garamond (Kinh điển)</option>
+        <option value="font-lora">Lora (Mềm mại)</option>
+        <option value="font-literata">Literata (Hiện đại)</option>
+        <option value="font-courier">Courier Prime (Đánh máy)</option>
+        <option value="font-vietnam">Be Vietnam Pro (Sans nét)</option>
+        <option value="font-helvetica">Helvetica (Quốc tế)</option>
+      </select>
+    </div>
+
+    <!-- Màu sắc -->
+    <div class="toolbar-group">
+      <label title="Đổi màu nền">Nền:
+        <input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)">
+      </label>
+      <label title="Đổi màu chữ">Chữ:
+        <input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)">
+      </label>
+      <button onclick="setCustomText('#263b72')" style="color: #60a5fa; font-weight: bold;" title="Màu xanh mực bút máy">#263b72</button>
+    </div>
+
+    <!-- Cỡ chữ, Dòng, Chữ, Lề -->
+    <div class="toolbar-group">
+      <label title="Cỡ chữ">Cỡ:<input type="range" id="fsInput" min="13" max="32" step="0.5" value="17.5" oninput="updateStyle('--font-size', this.value + 'px')"></label>
+      <label title="Giãn dòng">Dòng:<input type="range" id="lhInput" min="1.1" max="2.4" step="0.05" value="1.55" oninput="updateStyle('--line-height', this.value)"></label>
+      <label title="Giãn chữ">Chữ:<input type="range" id="lsInput" min="-0.8" max="2.5" step="0.1" value="0" oninput="updateStyle('--letter-spacing', this.value + 'px')"></label>
+      <label title="Thụt lề">Lề:<input type="range" id="tiInput" min="0" max="3.5" step="0.2" value="1.6" oninput="updateStyle('--text-indent', this.value + 'em')"></label>
+    </div>
+
+    <!-- Căn lề -->
+    <div class="toolbar-group">
+      <button class="btn-icon" onclick="formatDoc('justifyFull')" title="Căn đều">≡</button>
+      <button class="btn-icon" onclick="formatDoc('justifyCenter')" title="Căn giữa">≗</button>
+      <button class="btn-icon" onclick="formatDoc('justifyLeft')" title="Căn trái">⇥</button>
+      <button class="btn-icon" onclick="insertSceneBreak()" title="Chèn dấu hoa thị phân cảnh">⁂</button>
+    </div>
+
+    <!-- Highlight -->
+    <div class="toolbar-group">
+      <button onclick="toggleFormatSpan('hl-yellow')" title="Bật/Tắt Highlight vàng">Vàng</button>
+      <button onclick="toggleFormatSpan('hl-gray')" title="Bật/Tắt Highlight xám">Xám</button>
+      <button onclick="toggleFormatSpan('pencil-underline')" title="Bật/Tắt Gạch chân lượn sóng">〰 Gạch đỏ</button>
+      <button onclick="insertFootnoteMark()">Chú thích (¹)</button>
+      <button onclick="applyDropCap()">🔤 DropCap</button>
+    </div>
+
+    <button class="primary" onclick="exportImage()">📸 Tải PNG</button>
+  </div>
+
+  <div class="viewport">
+    <div class="stage-wrapper">
+      <span class="crop-mark crop-tl"></span>
+      <span class="crop-mark crop-tr"></span>
+      <span class="crop-mark crop-bl"></span>
+      <span class="crop-mark crop-br"></span>
+
+      <div class="book-wrapper" id="bookWrapper">
+        <div id="page" class="page mode-page font-garamond" spellcheck="false">
+          <div class="page-grain"></div>
+          <div class="page-vignette"></div>
+          
+          <div id="pageLayoutArea" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="page-header">
+                <div id="headerLeft" class="header-left" contenteditable="true" onblur="autoSavePreset()">Luật quản lý thuế</div>
+                <div id="headerRight" class="header-right" contenteditable="true" onblur="autoSavePreset()">(c): Tên tác giả</div>
+              </div>
+              
+              <div id="chapterHeader" class="chapter-heading-box" contenteditable="true">
+                <div class="chapter-num">CHƯƠNG I</div>
+                <div class="chapter-title">Những Quy Định Chung</div>
+                <div class="chapter-divider"></div>
+              </div>
+
+              <div id="pageBody" class="page-body" contenteditable="true">
+                <p class="has-dropcap"><span class="dropcap">L</span>uật này quy định việc quản lý các loại thuế, các khoản thu khác thuộc ngân sách nhà nước.</p>
+                <p><span class="hl-yellow">Người nộp thuế bao gồm:</span></p>
+                <p class="scene-break">* * *</p>
+                <p>Giải thích từ ngữ:</p>
+                <p>Trong Luật này, các từ ngữ dưới đây được hiểu như sau:</p>
+                <p>Thuế là một khoản nộp ngân sách nhà nước bắt buộc của <span class="hl-gray">tổ chức, hộ gia đình, hộ kinh doanh, cá nhân theo quy định của các luật thuế.²</span></p>
+              </div>
+            </div>
+
+            <div>
+              <div id="pageFootnotes" class="footnotes" contenteditable="true">
+                <div>¹ Chú thích nè</div>
+                <div>² Là ví dụ nếu chú thích thì viết ở đây á</div>
+              </div>
+              <div id="pageNumber" class="page-number" contenteditable="true">1</div>
+            </div>
+          </div>
+
+          <!-- KHUNG QUOTE VUÔNG -->
+          <div id="quoteLayoutArea" class="quote-container" style="display: none;">
+            <div class="quote-mark">“</div>
+            
+            <div id="quoteText" class="quote-content" contenteditable="true">
+              Người nộp thuế bao gồm:
+              <br>
+              Tổ chức, hộ gia đình, hộ kinh doanh, cá nhân nộp thuế theo quy định của pháp luật về thuế;
+            </div>
+
+            <div class="quote-footer">
+              <div class="quote-divider"></div>
+              <div id="quoteBookTitle" class="quote-title" contenteditable="true">TỰA ĐỀ TRUYỆN</div>
+              <div id="quoteAuthor" class="quote-sub" contenteditable="true">Tác giả • Trích chương xx</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentFont = 'font-garamond';
+    let currentMode = 'page';
+    let nextFootnoteNumber = 3;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedPreset();
+    });
+
+    function switchMode(mode) {
+      currentMode = mode;
+      const page = document.getElementById('page');
+      const pageArea = document.getElementById('pageLayoutArea');
+      const quoteArea = document.getElementById('quoteLayoutArea');
+      const fsInput = document.getElementById('fsInput');
+
+      if (mode === 'quote') {
+        page.classList.remove('mode-page');
+        page.classList.add('mode-quote');
+        pageArea.style.display = 'none';
+        quoteArea.style.display = 'flex';
+        if (parseFloat(fsInput.value) < 20) {
+          fsInput.value = 21.5;
+          updateStyle('--font-size', '21.5px');
+        }
+      } else {
+        page.classList.remove('mode-quote');
+        page.classList.add('mode-page');
+        quoteArea.style.display = 'none';
+        pageArea.style.display = 'flex';
+        if (parseFloat(fsInput.value) > 20) {
+          fsInput.value = 17.5;
+          updateStyle('--font-size', '17.5px');
+        }
+      }
+      applyAllTextEffects();
+    }
+
+    function toggleSpine() {
+      const page = document.getElementById('page');
+      page.classList.toggle('has-spine');
+      document.getElementById('spineBtn').classList.toggle('btn-active');
+      autoSavePreset();
+    }
+
+    function applyAllTextEffects() {
+      const bVal = parseFloat(document.getElementById('bleedSlider').value);
+      const sVal = parseFloat(document.getElementById('shadowSlider').value);
+      const wVal = parseFloat(document.getElementById('wetSlider').value);
+      const pVal = parseFloat(document.getElementById('pressSlider').value);
+      const gVal = parseFloat(document.getElementById('glowSlider').value);
+
+      const shadowLayers = [];
+
+      if (sVal > 0) {
+        const x = (sVal * 0.4).toFixed(1);
+        const y = (sVal * 0.7).toFixed(1);
+        const blur = (sVal * 1.0).toFixed(1);
+        const alpha = Math.min(0.06 + sVal * 0.045, 0.28).toFixed(2);
+        shadowLayers.push(`${x}px ${y}px ${blur}px rgba(0, 0, 0, ${alpha})`);
+      }
+
+      if (pVal > 0) {
+        const lightA = Math.min(0.15 + pVal * 0.06, 0.45).toFixed(2);
+        const darkA = Math.min(0.08 + pVal * 0.04, 0.25).toFixed(2);
+        shadowLayers.push(`0 ${(pVal * 0.3).toFixed(1)}px ${(pVal * 0.4).toFixed(1)}px rgba(255, 255, 255, ${lightA})`);
+        shadowLayers.push(`0 -${(pVal * 0.25).toFixed(1)}px ${(pVal * 0.3).toFixed(1)}px rgba(0, 0, 0, ${darkA})`);
+      }
+
+      const filterLayers = [];
+
+      if (bVal > 0) {
+        filterLayers.push('url(#ink-bleed-filter)');
+        document.getElementById('feDispPreview').setAttribute('scale', (bVal * 1.0).toFixed(1));
+        document.getElementById('feDispCanvas').setAttribute('scale', (bVal * 4.0).toFixed(1));
+      } else {
+        document.getElementById('feDispPreview').setAttribute('scale', '0');
+        document.getElementById('feDispCanvas').setAttribute('scale', '0');
+      }
+
+      if (wVal > 0) {
+        const contrast = (100 + wVal * 5).toFixed(0);
+        filterLayers.push(`contrast(${contrast}%)`);
+        filterLayers.push(`drop-shadow(0 0 ${(wVal * 0.2).toFixed(1)}px currentColor)`);
+      }
+
+      if (gVal > 0) {
+        filterLayers.push(`drop-shadow(0 0 ${(gVal * 0.8).toFixed(1)}px currentColor)`);
+      }
+
+      const finalShadow = shadowLayers.length > 0 ? shadowLayers.join(', ') : 'none';
+      const finalFilter = filterLayers.length > 0 ? filterLayers.join(' ') : 'none';
+
+      const textNodes = document.querySelectorAll('#pageBody, #quoteText, .chapter-title, .chapter-num, .quote-title, .quote-sub');
+      textNodes.forEach(el => {
+        if (el) {
+          el.style.textShadow = finalShadow;
+          el.style.filter = finalFilter;
+        }
+      });
+
+      autoSavePreset();
+    }
+
+    function setCustomBg(color) {
+      document.documentElement.style.setProperty('--custom-bg', color);
+      document.getElementById('bgPicker').value = color;
+      autoSavePreset();
+    }
+
+    function setCustomText(color) {
+      document.documentElement.style.setProperty('--custom-text', color);
+      document.getElementById('textPicker').value = color;
+      autoSavePreset();
+    }
+
+    function changeFont(fontClass) {
+      const page = document.getElementById('page');
+      page.classList.remove(currentFont);
+      page.classList.add(fontClass);
+      currentFont = fontClass;
+      autoSavePreset();
+    }
+
+    function updateStyle(prop, val) {
+      document.documentElement.style.setProperty(prop, val);
+      autoSavePreset();
+    }
+
+    function toggleFormatSpan(className) {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      let container = range.commonAncestorContainer;
+      if (container.nodeType === 3) container = container.parentElement;
+
+      const existingSpan = container.closest('.' + className);
+
+      if (existingSpan) {
+        const parent = existingSpan.parentNode;
+        while (existingSpan.firstChild) {
+          parent.insertBefore(existingSpan.firstChild, existingSpan);
+        }
+        parent.removeChild(existingSpan);
+      } else {
+        const span = document.createElement("span");
+        span.className = className;
+        span.appendChild(range.extractContents());
+        range.insertNode(span);
+      }
+      autoSavePreset();
+    }
+
+    function getPresetData() {
+      return {
+        font: currentFont,
+        bg: document.getElementById('bgPicker').value,
+        text: document.getElementById('textPicker').value,
+        fontSize: document.getElementById('fsInput').value,
+        lineHeight: document.getElementById('lhInput').value,
+        letterSpacing: document.getElementById('lsInput').value,
+        textIndent: document.getElementById('tiInput').value,
+        bleed: document.getElementById('bleedSlider').value,
+        shadow: document.getElementById('shadowSlider').value,
+        wet: document.getElementById('wetSlider').value,
+        press: document.getElementById('pressSlider').value,
+        glow: document.getElementById('glowSlider').value,
+        headerLeft: document.getElementById('headerLeft').innerText,
+        headerRight: document.getElementById('headerRight').innerText,
+        spine: document.getElementById('page').classList.contains('has-spine')
+      };
+    }
+
+    function autoSavePreset() {
+      localStorage.setItem('book_preset_settings', JSON.stringify(getPresetData()));
+    }
+
+    function savePresetManual() {
+      autoSavePreset();
+      alert("✅ Đã lưu toàn bộ thiết lập!");
+    }
+
+    function loadSavedPreset() {
+      const saved = localStorage.getItem('book_preset_settings');
+      if (!saved) return;
+      try {
+        const data = JSON.parse(saved);
+        if (data.font) {
+          document.getElementById('fontSelect').value = data.font;
+          changeFont(data.font);
+        }
+        if (data.bg) setCustomBg(data.bg);
+        if (data.text) setCustomText(data.text);
+        if (data.fontSize) {
+          document.getElementById('fsInput').value = data.fontSize;
+          updateStyle('--font-size', data.fontSize + 'px');
+        }
+        if (data.lineHeight) {
+          document.getElementById('lhInput').value = data.lineHeight;
+          updateStyle('--line-height', data.lineHeight);
+        }
+        if (data.letterSpacing) {
+          document.getElementById('lsInput').value = data.letterSpacing;
+          updateStyle('--letter-spacing', data.letterSpacing + 'px');
+        }
+        if (data.textIndent) {
+          document.getElementById('tiInput').value = data.textIndent;
+          updateStyle('--text-indent', data.textIndent + 'em');
+        }
+        
+        if (data.bleed !== undefined) document.getElementById('bleedSlider').value = data.bleed;
+        if (data.shadow !== undefined) document.getElementById('shadowSlider').value = data.shadow;
+        if (data.wet !== undefined) document.getElementById('wetSlider').value = data.wet;
+        if (data.press !== undefined) document.getElementById('pressSlider').value = data.press;
+        if (data.glow !== undefined) document.getElementById('glowSlider').value = data.glow;
+
+        if (data.headerLeft) document.getElementById('headerLeft').innerText = data.headerLeft;
+        if (data.headerRight) document.getElementById('headerRight').innerText = data.headerRight;
+
+        if (data.spine) {
+          document.getElementById('page').classList.add('has-spine');
+          document.getElementById('spineBtn').classList.add('btn-active');
+        } else {
+          document.getElementById('page').classList.remove('has-spine');
+          document.getElementById('spineBtn').classList.remove('btn-active');
+        }
+
+        applyAllTextEffects();
+      } catch (e) {}
+    }
+
+    function nextPage() {
+      if (!confirm("Bà có muốn sang trang mới không? (Định dạng giữ nguyên, số trang tự tăng).")) return;
+      const pageNumEl = document.getElementById('pageNumber');
+      let currentNum = parseInt(pageNumEl.innerText.trim(), 10);
+      pageNumEl.innerText = isNaN(currentNum) ? 2 : (currentNum + 1);
+      document.getElementById('chapterHeader').style.display = 'none';
+      document.getElementById('pageBody').innerHTML = '<p>Bắt đầu nhập nội dung trang mới vào đây...</p>';
+      document.getElementById('pageFootnotes').innerHTML = '';
+      nextFootnoteNumber = 1;
+    }
+
+    function formatDoc(cmd) {
+      document.execCommand(cmd, false, null);
+    }
+
+    function insertSceneBreak() {
+      const html = '<p class="scene-break">* * *</p><p><br></p>';
+      document.execCommand('insertHTML', false, html);
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        const active = document.activeElement;
+        if (active && active.isContentEditable) {
+          e.preventDefault();
+          document.execCommand('insertHTML', false, '&emsp;&emsp;');
+        }
+      }
+    });
+
+    function toSuperscript(str) {
+      const map = {
+        '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+        '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹'
+      };
+      return String(str).split('').map(ch => map[ch] || ch).join('');
+    }
+
+    function insertFootnoteMark() {
+      const input = prompt("Nhập số chú thích (bấm số thường 1, 2, 3...):", nextFootnoteNumber);
+      if (input === null || input.trim() === "") return;
+
+      const num = input.trim();
+      const supText = toSuperscript(num);
+      document.execCommand("insertText", false, supText);
+
+      const footnotesBox = document.getElementById('pageFootnotes');
+      const newFootnoteLine = document.createElement('div');
+      newFootnoteLine.innerText = `${supText} "Nhập nội dung giải nghĩa..."`;
+      footnotesBox.appendChild(newFootnoteLine);
+
+      const parsed = parseInt(num, 10);
+      if (!isNaN(parsed)) nextFootnoteNumber = parsed + 1;
+    }
+
+    function applyDropCap() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount || selection.isCollapsed) {
+        alert("Bà bôi đen 1 chữ cái đầu dòng rồi ấn nút nhé!");
+        return;
+      }
+      const range = selection.getRangeAt(0);
+      const span = document.createElement("span");
+      span.className = "dropcap";
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+
+      let parentP = span.closest('p');
+      if (parentP) parentP.classList.add('has-dropcap');
+    }
+
+    function exportImage() {
+      const wrapper = document.getElementById('bookWrapper');
+      const page = document.getElementById('page');
+      
+      const prevTransform = wrapper.style.transform;
+      wrapper.style.transform = 'none';
+
+      const pageRect = page.getBoundingClientRect();
+      const highlightSpans = page.querySelectorAll('.hl-yellow, .hl-gray');
+      const tempBgElements = [];
+      const modifiedSpans = [];
+
+      highlightSpans.forEach(span => {
+        const range = document.createRange();
+        range.selectNodeContents(span);
+        const rects = range.getClientRects();
+        const bgColor = window.getComputedStyle(span).backgroundColor;
+
+        if (rects.length > 0) {
+          modifiedSpans.push({
+            span: span,
+            origBg: span.style.backgroundColor
+          });
+          span.style.backgroundColor = 'transparent';
+
+          for (let i = 0; i < rects.length; i++) {
+            const r = rects[i];
+            if (r.width <= 0 || r.height <= 0) continue;
+
+            const bgDiv = document.createElement('div');
+            bgDiv.className = 'temp-hl-bg';
+            bgDiv.style.left = (r.left - pageRect.left - 2) + 'px';
+            bgDiv.style.top = (r.top - pageRect.top - 1) + 'px';
+            bgDiv.style.width = (r.width + 4) + 'px';
+            bgDiv.style.height = (r.height + 2) + 'px';
+            bgDiv.style.backgroundColor = bgColor;
+
+            page.appendChild(bgDiv);
+            tempBgElements.push(bgDiv);
+          }
+        }
+      });
+
+      page.style.textRendering = 'optimizeLegibility';
+      page.style.webkitFontSmoothing = 'antialiased';
+
+      html2canvas(page, {
+        scale: 4,
+        useCORS: true,
+        backgroundColor: null
+      }).then(canvas => {
+        tempBgElements.forEach(el => el.remove());
+        modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
+        wrapper.style.transform = prevTransform;
+
+        let finalCanvas = canvas;
+        const bVal = parseFloat(document.getElementById('bleedSlider').value);
+
+        if (bVal > 0) {
+          const bleedCanvas = document.createElement('canvas');
+          bleedCanvas.width = canvas.width;
+          bleedCanvas.height = canvas.height;
+          const bCtx = bleedCanvas.getContext('2d');
+
+          bCtx.filter = 'url(#ink-bleed-filter-4k)';
+          bCtx.drawImage(canvas, 0, 0);
+
+          if (bCtx.filter === 'none' || !bCtx.filter) {
+            bCtx.clearRect(0, 0, canvas.width, canvas.height);
+            bCtx.filter = 'contrast(120%) blur(0.8px)';
+            bCtx.drawImage(canvas, 0, 0);
+          }
+          finalCanvas = bleedCanvas;
+        }
+
+        const link = document.createElement('a');
+        const prefix = (currentMode === 'quote') ? 'quote-wattpad-' : 'trang-sach-';
+        link.download = prefix + Date.now() + '.png';
+        link.href = finalCanvas.toDataURL('image/png');
+        link.click();
+      }).catch(err => {
+        tempBgElements.forEach(el => el.remove());
+        modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
+        wrapper.style.transform = prevTransform;
+        console.error(err);
+        alert("Có lỗi khi tạo ảnh, bà thử lại nha!");
+      });
+    }
+  </script>
+</body>
+</html>
