@@ -107,7 +107,6 @@
       overflow: hidden;
     }
 
-    /* BỘ ĐIỀU KHIỂN SỐ DẠNG STEPPER BẤM CHO ĐIỆN THOẠI */
     .num-stepper {
       display: inline-flex;
       align-items: center;
@@ -258,7 +257,8 @@
       z-index: 1;
     }
 
-    .page.has-spine::after {
+    /* CHỈ ÁP DỤNG BÓNG GÁY 3D TRÊN KHỔ TRANG SÁCH DÀI, CẤM TUYỆT ĐỐI TRÊN KHỔ QUOTE VUÔNG */
+    .page.mode-page.has-spine::after {
       content: "";
       position: absolute;
       top: 0; bottom: 0; left: 0;
@@ -266,6 +266,11 @@
       background: linear-gradient(to right, rgba(0,0,0,0.16) 0%, rgba(0,0,0,0.05) 50%, transparent 100%);
       pointer-events: none;
       z-index: 5;
+    }
+
+    /* KHỔ QUOTE VUÔNG THÌ ẨN TRIỆT ĐỂ BÓNG GÁY */
+    .page.mode-quote::after {
+      display: none !important;
     }
 
     #pageLayoutArea, #quoteLayoutArea {
@@ -513,7 +518,7 @@
       <div class="toolbar-group">
         <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
         <button onclick="nextPage()" title="Tăng số trang và sang trang mới">📄 Trang Mới</button>
-        <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D">📖 Gáy 3D</button>
+        <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D (Chỉ áp dụng trang dài)">📖 Gáy 3D</button>
         <button onmousedown="event.preventDefault()" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold; background: #3b3a4a;">⇥ Tab</button>
       </div>
 
@@ -588,6 +593,8 @@
 
       <!-- Giấy & Màu sắc -->
       <div class="toolbar-group">
+        <label title="Tối viền">Viền:<input type="range" min="0" max="0.3" step="0.02" value="0.08" oninput="updateStyle('--vignette-opacity', this.value)"></label>
+        <label title="Hạt giấy">Hạt:<input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)">
         <label title="Đổi màu nền">Nền:<input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)"></label>
         <label title="Đổi màu chữ">Chữ:<input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)"></label>
         <button onclick="setCustomText('#263b72')" style="color: #60a5fa; font-weight: bold;">#263b72</button>
@@ -695,7 +702,6 @@
     let currentMode = 'page';
     let nextFootnoteNumber = 3;
 
-    // HÀM TĂNG/GIẢM BẬC CHO STEPPER
     function adjustStepper(id, delta) {
       const input = document.getElementById(id);
       if (!input) return;
@@ -707,11 +713,9 @@
       val = Math.min(Math.max(val, min), max);
       
       input.value = val;
-      // Kích hoạt cập nhật
       input.dispatchEvent(new Event('input'));
     }
 
-    // LỌC CHỈ LẤY PLAIN TEXT KHI DÁN
     document.addEventListener('paste', function(e) {
       const active = document.activeElement;
       if (active && active.isContentEditable) {
@@ -723,7 +727,6 @@
       }
     });
 
-    // NÚT TAB THỤT LỀ
     function insertTabIndent() {
       document.execCommand('insertHTML', false, '&emsp;&emsp;');
     }
@@ -1048,8 +1051,8 @@
       if (parentP) parentP.classList.add('has-dropcap');
     }
 
-   // =========================================================================
-    // HÀM XUẤT ẢNH HOÀN HẢO CHO CẢ ĐIỆN THOẠI LẪN MÁY TÍNH
+    // =========================================================================
+    // XUẤT ẢNH HOÀN HẢO: ĐÃ LOẠI TRỪ 100% VỆT XÁM GÁY SÁCH KHI Ở KHỔ QUOTE
     // =========================================================================
     async function exportImage() {
       const sandbox = document.getElementById('scaleSandbox');
@@ -1063,16 +1066,20 @@
       const prevSandboxTransform = sandbox.style.transform;
       const prevSandboxMargin = sandbox.style.marginBottom;
       
-      // Tạm đưa scale về chuẩn 1:1 trong tích tắc để chụp
       sandbox.style.transform = 'none';
       sandbox.style.marginBottom = '0px';
+
+      // NẾU LÀ KHỔ QUOTE VUÔNG: TẠM THỜI TẮT BỎ HẲN LỚP GÁY SÁCH KHI CHỤP
+      const hadSpine = page.classList.contains('has-spine');
+      if (currentMode === 'quote' && hadSpine) {
+        page.classList.remove('has-spine');
+      }
 
       const pageRect = page.getBoundingClientRect();
       const highlightSpans = page.querySelectorAll('.hl-yellow, .hl-gray');
       const tempBgElements = [];
       const modifiedSpans = [];
 
-      // Tách lớp Highlight lót bên dưới chống lỗi tràn mép
       highlightSpans.forEach(span => {
         const range = document.createRange();
         range.selectNodeContents(span);
@@ -1107,7 +1114,6 @@
       page.style.textRendering = 'optimizeLegibility';
       page.style.webkitFontSmoothing = 'antialiased';
 
-      // Nhận diện điện thoại để chỉnh scale vừa vặn không bị tràn RAM
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
       const renderScale = isMobile ? 2.2 : 3.5; 
 
@@ -1120,16 +1126,20 @@
           logging: false
         });
 
-        // Khôi phục giao diện màn hình ngay lập tức
         tempBgElements.forEach(el => el.remove());
         modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
+        
         sandbox.style.transform = prevSandboxTransform;
         sandbox.style.marginBottom = prevSandboxMargin;
+
+        // Trả lại trạng thái gáy sách sau khi chụp xong
+        if (currentMode === 'quote' && hadSpine) {
+          page.classList.add('has-spine');
+        }
 
         let finalCanvas = canvas;
         const bVal = parseFloat(document.getElementById('bleedSlider').value) || 0;
 
-        // Xử lý mực lem an toàn
         if (bVal > 0) {
           try {
             const bleedCanvas = document.createElement('canvas');
@@ -1147,20 +1157,18 @@
             }
             finalCanvas = bleedCanvas;
           } catch (e) {
-            finalCanvas = canvas; // Dự phòng an toàn nếu lỗi filter
+            finalCanvas = canvas;
           }
         }
 
         const fileName = (currentMode === 'quote' ? 'quote-wattpad-' : 'trang-sach-') + Date.now() + '.png';
 
-        // XUẤT FILE AN TOÀN TRÊN MOBILE
         finalCanvas.toBlob(async (blob) => {
           if (!blob) {
             fallbackDownload(finalCanvas.toDataURL('image/png'), fileName);
             return;
           }
 
-          // 1. Thử dùng tính năng chia sẻ gốc của iPhone / Android (Lưu thẳng vào thư viện ảnh)
           const file = new File([blob], fileName, { type: 'image/png' });
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             try {
@@ -1171,12 +1179,9 @@
               exportBtn.innerText = originalBtnText;
               exportBtn.disabled = false;
               return;
-            } catch (shareErr) {
-              // Người dùng bấm hủy share thì tiếp tục tải bình thường
-            }
+            } catch (shareErr) {}
           }
 
-          // 2. Tải qua Blob URL (Chuẩn cho Chrome & Firefox)
           const blobUrl = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.download = fileName;
@@ -1195,6 +1200,7 @@
         modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
         sandbox.style.transform = prevSandboxTransform;
         sandbox.style.marginBottom = prevSandboxMargin;
+        if (currentMode === 'quote' && hadSpine) page.classList.add('has-spine');
         exportBtn.innerText = originalBtnText;
         exportBtn.disabled = false;
         console.error(err);
@@ -1202,7 +1208,6 @@
       }
     }
 
-    // Hàm dự phòng: Mở ảnh lên tab mới nếu điện thoại chặn tự động tải
     function fallbackDownload(dataUrl, fileName) {
       const img = new Image();
       img.src = dataUrl;
