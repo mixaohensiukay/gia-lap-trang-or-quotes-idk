@@ -60,19 +60,30 @@ Tất cả hiệu ứng đều điều chỉnh linh hoạt theo thời gian th�
 5. Sau 1-2 phút, GitHub sẽ cung cấp đường link web online hoạt động 24/7 có dạng:
    ```text
    https://<username>.github.io/<ten-repo>/
-   ⌨️ Bảng Phím Tắt Tiện Lợi
-Phím tắt	Chức năng
-Tab	Thụt đầu dòng chuẩn in ấn (&emsp;&emsp;)
-Ctrl / Cmd + Z	Hoàn tác thao tác trước (Undo)
-Ctrl / Cmd + Y (hoặc Ctrl + Shift + Z)	Làm lại thao tác sau (Redo)
-Ctrl / Cmd + B	In đậm chữ
-Ctrl / Cmd + I	In nghiêng chữ
-Ctrl / Cmd + U	Gạch chân chữ
-🛠️ Công Nghệ Sử Dụng
-HTML5 & CSS3: CSS Variables, Flexbox Grid, Glassmorphism UI, Responsive Auto-Fit Matrix.
-SVG Filters: feTurbulence, feDisplacementMap, feGaussianBlur xử lý biến dạng xơ sợi và độ ngấm mực vật lý.
-JavaScript (ES6): Async/Await Queue Rendering, DOM Range Manipulation, LocalStorage API.
-html2canvas: Thư viện trích xuất DOM thành canvas độ phân giải cực cao (Scale 4.0 ~2080px–2200px).
-Google Fonts: Tích hợp bộ font chuẩn tiếng Việt (EB Garamond, Alegreya, STIX Two Text, Lora, Literata, Courier Prime, Be Vietnam Pro, Helvetica, Playfair Display).
-📄 License
-Phát hành theo giấy phép MIT License. Thoải mái sử dụng cho mục đích cá nhân, viết lách, sáng tạo nội dung hoặc phát triển mở rộng tính năng!
+---
+
+## ⌨️ Bảng Phím Tắt Tiện Lợi
+
+| Phím tắt | Chức năng |
+| :--- | :--- |
+| `Tab` | Thụt đầu dòng chuẩn in ấn (`&emsp;&emsp;`) |
+| `Ctrl / Cmd + Z` | Hoàn tác thao tác trước (Undo) |
+| `Ctrl / Cmd + Y` *(hoặc `Ctrl + Shift + Z`)* | Làm lại thao tác sau (Redo) |
+| `Ctrl / Cmd + B` | In đậm chữ |
+| `Ctrl / Cmd + I` | In nghiêng chữ |
+| `Ctrl / Cmd + U` | Gạch chân chữ |
+
+---
+
+## 🛠️ Công Nghệ Sử Dụng
+
+- **HTML5 & CSS3:** CSS Variables, Flexbox Grid, Glassmorphism UI, Responsive Auto-Fit Matrix.
+- **SVG Filters:** `feTurbulence`, `feDisplacementMap`, `feGaussianBlur` xử lý biến dạng xơ sợi và độ ngấm mực vật lý.
+- **JavaScript (ES6):** Async/Await Queue Rendering, DOM Range Manipulation, LocalStorage API.
+- **html2canvas:** Thư viện trích xuất DOM thành canvas độ phân giải cực cao (Scale 4.0 ~2080px–2200px).
+- **Google Fonts:** Tích hợp bộ font chuẩn tiếng Việt (*EB Garamond, Alegreya, STIX Two Text, Lora, Literata, Courier Prime, Be Vietnam Pro, Helvetica, Playfair Display*).
+
+---
+
+## 📄 License
+Phát hành theo giấy phép [MIT License](LICENSE). Thoải mái sử dụng cho mục đích cá nhân, viết lách, sáng tạo nội dung hoặc phát triển mở rộng tính năng!
