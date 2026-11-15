@@ -23,46 +23,74 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
+    /* ========================================================================= */
+    /* HỆ THỐNG MÀU SẮC (THEME SKINS): MẶC ĐỊNH LÀ PASTEL XANH DƯƠNG XINH LUNG LINH */
+    /* ========================================================================= */
     :root {
-      --bg-editor: #121214;
+      /* Theme Pastel Blue (Mặc định) */
+      --ui-bg: #eaf2f8;                      /* Nền web xanh mây trời pastel */
+      --ui-toolbar-bg: rgba(255, 255, 255, 0.85); /* Thanh công cụ kính mờ trắng trong */
+      --ui-border: #cfe0ee;                  /* Viền xanh phấn êm dịu */
+      --ui-card-bg: #f3f8fc;                 /* Nền nút bấm pastel */
+      --ui-card-hover: #e2edf6;
+      --ui-text-main: #24384d;               /* Màu chữ xanh than sang trọng */
+      --ui-text-muted: #5e7994;
+      --ui-accent: #3b82f6;                  /* Xanh dương chủ đạo */
+      --ui-accent-hover: #2563eb;
+      --ui-shadow: 0 10px 30px rgba(59, 130, 246, 0.12);
+
+      /* Thông số trang sách giấy */
       --paper-cream: #f7f4ec;
-      --paper-aged: #eee5d3;
-      --paper-typewriter: #fdfbf7;
-      --paper-dark: #191817;
-      
       --custom-bg: #f7f4ec;
       --custom-text: #1c1b1a;
       --font-size: 17.5px;
       --line-height: 1.55;
       --letter-spacing: 0px;
       --text-indent: 1.6em;
-
       --grain-opacity: 0.045;
       --vignette-opacity: 0.08;
+    }
+
+    /* Theme Dark Studio (Dành cho ai thích viết đêm) */
+    body.theme-dark {
+      --ui-bg: #121214;
+      --ui-toolbar-bg: rgba(26, 26, 32, 0.9);
+      --ui-border: #33333f;
+      --ui-card-bg: #26262e;
+      --ui-card-hover: #353540;
+      --ui-text-main: #f0f0f5;
+      --ui-text-muted: #9595a8;
+      --ui-accent: #6366f1;
+      --ui-accent-hover: #4f46e5;
+      --ui-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     
     body {
-      background-color: var(--bg-editor);
+      background-color: var(--ui-bg);
       font-family: system-ui, -apple-system, sans-serif;
-      color: #e5e5e5;
+      color: var(--ui-text-main);
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 0 60px 0;
+      padding: 0 0 70px 0;
       min-height: 100vh;
       overflow-x: hidden;
+      transition: background-color 0.3s ease;
     }
 
+    /* THANH CÔNG CỤ KÍNH MỜ PASTEL (GLASSMORPHISM) */
     .toolbar-container {
       width: 100%;
       position: sticky;
       top: 0;
       z-index: 100;
-      background: #18181c;
-      border-bottom: 1px solid #2d2d38;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      background: var(--ui-toolbar-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--ui-border);
+      box-shadow: var(--ui-shadow);
       display: flex;
       justify-content: center;
     }
@@ -78,7 +106,7 @@
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
-      scrollbar-color: #3f3f4c transparent;
+      scrollbar-color: var(--ui-border) transparent;
     }
 
     @media (min-width: 1024px) {
@@ -95,7 +123,7 @@
       height: 4px;
     }
     .toolbar::-webkit-scrollbar-thumb {
-      background: #3f3f4c;
+      background: var(--ui-border);
       border-radius: 4px;
     }
 
@@ -104,8 +132,8 @@
       align-items: center;
       gap: 6px;
       font-size: 13px;
-      color: #ddd;
-      border-right: 1px solid #33333d;
+      color: var(--ui-text-muted);
+      border-right: 1px solid var(--ui-border);
       padding-right: 8px;
       flex-shrink: 0;
     }
@@ -116,49 +144,56 @@
     }
 
     .toolbar select, .toolbar button, .toolbar input[type="color"] {
-      background: #2a2a32;
-      color: #fff;
-      border: 1px solid #40404c;
-      padding: 6px 9px;
-      border-radius: 6px;
+      background: var(--ui-card-bg);
+      color: var(--ui-text-main);
+      border: 1px solid var(--ui-border);
+      padding: 6px 10px;
+      border-radius: 8px;
       font-size: 13px;
       cursor: pointer;
       outline: none;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
       flex-shrink: 0;
+    }
+
+    .toolbar button:hover {
+      background: var(--ui-card-hover);
+      transform: translateY(-1px);
     }
 
     .toolbar input[type="color"] {
       width: 28px;
       height: 28px;
       padding: 0;
-      border: none;
+      border: 1px solid var(--ui-border);
       border-radius: 50%;
       overflow: hidden;
     }
 
+    /* STEPPERS BẤM SỐ XINH XẮN */
     .num-stepper {
       display: inline-flex;
       align-items: center;
-      background: #22222a;
-      border: 1px solid #3d3d4a;
-      border-radius: 6px;
+      background: var(--ui-card-bg);
+      border: 1px solid var(--ui-border);
+      border-radius: 8px;
       overflow: hidden;
-      height: 30px;
+      height: 32px;
     }
 
     .num-stepper span.stepper-label {
-      padding: 0 5px;
+      padding: 0 6px;
       font-size: 11.5px;
-      color: #aaa;
+      font-weight: 600;
+      color: var(--ui-text-muted);
       user-select: none;
     }
 
     .num-stepper button {
-      background: #2e2e38;
+      background: transparent;
       border: none;
-      color: #eee;
-      width: 24px;
+      color: var(--ui-text-main);
+      width: 22px;
       height: 100%;
       display: inline-flex;
       align-items: center;
@@ -170,16 +205,23 @@
       cursor: pointer;
     }
 
-    .num-stepper button:hover { background: #3f3f4c; }
-    .num-stepper button:active { background: #4f46e5; }
+    .num-stepper button:hover {
+      background: var(--ui-card-hover);
+    }
+
+    .num-stepper button:active {
+      background: var(--ui-accent);
+      color: #fff;
+    }
 
     .num-stepper input[type="number"] {
       width: 38px;
       height: 100%;
       background: transparent;
       border: none;
-      color: #fff;
+      color: var(--ui-text-main);
       font-size: 12.5px;
+      font-weight: 600;
       text-align: center;
       outline: none;
       font-family: inherit;
@@ -192,26 +234,36 @@
       margin: 0;
     }
 
-    .toolbar button:hover { background: #3b3b47; }
+    /* NÚT TẢI ẢNH NỔI BẬT */
     .toolbar button.primary {
-      background: #2563eb;
-      border-color: #1d4ed8;
+      background: var(--ui-accent);
+      border-color: var(--ui-accent);
+      color: #fff;
       font-weight: 600;
       padding: 6px 14px;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
     }
-    .toolbar button.primary:hover { background: #1d4ed8; }
+    .toolbar button.primary:hover { 
+      background: var(--ui-accent-hover); 
+    }
 
     .btn-active {
-      background: #4f46e5 !important;
-      border-color: #6366f1 !important;
+      background: var(--ui-accent) !important;
+      border-color: var(--ui-accent) !important;
       font-weight: bold;
       color: #fff !important;
     }
 
     .highlight-select {
-      background: #4338ca !important;
-      font-weight: bold;
-      border-color: #6366f1 !important;
+      background: #e0ecff !important;
+      font-weight: 600;
+      border-color: #bcd4f5 !important;
+      color: #1e40af !important;
+    }
+    body.theme-dark .highlight-select {
+      background: #312e81 !important;
+      border-color: #4338ca !important;
+      color: #c7d2fe !important;
     }
 
     .btn-icon {
@@ -250,9 +302,8 @@
       transition: outline 0.2s;
     }
 
-    /* Đánh dấu trang đang được người dùng bấm chọn */
     .stage-wrapper.active-page {
-      outline: 2px dashed #4f46e5;
+      outline: 2px dashed var(--ui-accent);
       outline-offset: 4px;
       border-radius: 8px;
     }
@@ -263,25 +314,33 @@
       align-items: center;
       margin-bottom: 8px;
       font-size: 12px;
-      color: #888;
+      color: var(--ui-text-muted);
       font-weight: 600;
     }
 
     .btn-delete-page {
+      background: #fee2e2 !important;
+      color: #dc2626 !important;
+      border: 1px solid #fca5a5 !important;
+      padding: 2px 8px !important;
+      font-size: 11px !important;
+      border-radius: 6px !important;
+    }
+    body.theme-dark .btn-delete-page {
       background: #3b1e1e !important;
       color: #ff8888 !important;
       border: 1px solid #5a2e2e !important;
-      padding: 2px 8px !important;
-      font-size: 11px !important;
-      border-radius: 4px !important;
     }
 
     .crop-mark {
       position: absolute;
       width: 14px;
       height: 14px;
-      border-color: rgba(255, 255, 255, 0.22);
+      border-color: rgba(94, 121, 148, 0.4);
       pointer-events: none;
+    }
+    body.theme-dark .crop-mark {
+      border-color: rgba(255, 255, 255, 0.22);
     }
     .crop-tl { top: 0; left: 0; border-top: 1.5px solid; border-left: 1.5px solid; }
     .crop-tr { top: 0; right: 0; border-top: 1.5px solid; border-right: 1.5px solid; }
@@ -291,6 +350,9 @@
     .book-wrapper {
       background: #111;
       border-radius: 4px;
+      box-shadow: 0 16px 40px rgba(36, 56, 77, 0.18);
+    }
+    body.theme-dark .book-wrapper {
       box-shadow: 0 16px 44px rgba(0,0,0,0.7);
     }
 
@@ -574,17 +636,18 @@
           <option value="page">📄 Khổ trang dài</option>
           <option value="quote">🔲 Quote vuông 1:1</option>
         </select>
-        <!-- HAI LỰA CHỌN TẢI: TẢI TRANG ĐANG CHỌN HOẶC TẢI TẤT CẢ -->
         <button class="primary" onclick="exportActivePage()">📸 Tải trang đang chọn</button>
-        <button class="primary" style="background:#059669;border-color:#047857;" onclick="exportAllPages()">📦 Tải TẤT CẢ trang</button>
+        <button class="primary" style="background:#10b981;border-color:#059669;" onclick="exportAllPages()">📦 Tải TẤT CẢ trang</button>
       </div>
 
-      <!-- Nhóm 2: Dự án & Thêm trang mới -->
+      <!-- Nhóm 2: Skin giao diện, Dự án & Thêm trang mới -->
       <div class="toolbar-group">
-        <button onclick="savePresetManual()" title="Lưu lại toàn bộ các trang và định dạng">💾 Lưu</button>
-        <button onclick="addNewPage()" title="Thêm một trang mới nằm tiếp theo phía dưới" style="font-weight:bold;color:#60a5fa;">➕ Thêm Trang</button>
+        <!-- NÚT CHUYỂN SKIN PASTEL BLUE / DARK STUDIO -->
+        <button onclick="toggleThemeSkin()" id="themeSkinBtn" title="Đổi giao diện Pastel Xanh / Dark Studio" style="font-weight: 600;">🎨 Skin Xanh</button>
+        <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
+        <button onclick="addNewPage()" title="Thêm một trang mới nằm tiếp theo phía dưới" style="font-weight:bold;color:var(--ui-accent);">➕ Thêm Trang</button>
         <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D (Chỉ áp dụng trang dài)">📖 Gáy 3D</button>
-        <button class="prevent-lose-focus" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold; background: #3b3a4a;">⇥ Tab</button>
+        <button class="prevent-lose-focus" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold;">⇥ Tab</button>
       </div>
 
       <!-- Nhóm 3: Cỡ chữ & Giãn dòng -->
@@ -662,7 +725,7 @@
         <label title="Hạt giấy">Hạt:<input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)" style="width:42px;height:5px;cursor:ew-resize;"></label>
         <label title="Đổi màu nền">Nền:<input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)"></label>
         <label title="Đổi màu chữ">Chữ:<input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)"></label>
-        <button onclick="setCustomText('#263b72')" style="color: #60a5fa; font-weight: bold;">#263b72</button>
+        <button onclick="setCustomText('#263b72')" style="color: #2563eb; font-weight: bold;">#263b72</button>
         
         <select id="fontSelect" onchange="changeFont(this.value)">
           <option value="font-alegreya">Alegreya (Thơ mộng)</option>
@@ -686,7 +749,7 @@
         <button class="prevent-lose-focus" onclick="toggleFormatSpan('hl-yellow')">Vàng</button>
         <button class="prevent-lose-focus" onclick="toggleFormatSpan('hl-gray')">Xám</button>
         <button class="prevent-lose-focus" onclick="toggleFormatSpan('pencil-underline')">〰 Gạch đỏ</button>
-        <button class="prevent-lose-focus" onclick="clearHighlightFormatting()" title="Xóa toàn bộ màu Highlight & Gạch đỏ" style="background: #472a2a; border-color: #6e3535; color: #ff9b9b; font-weight: bold;">🧹 Xóa màu</button>
+        <button class="prevent-lose-focus" onclick="clearHighlightFormatting()" title="Xóa toàn bộ màu Highlight & Gạch đỏ" style="background: #fee2e2; border-color: #fca5a5; color: #dc2626; font-weight: bold;">🧹 Xóa màu</button>
         
         <button class="prevent-lose-focus" onclick="insertFootnoteMark()">Chú thích (¹)</button>
         <button class="prevent-lose-focus" onclick="applyDropCap()">🔤 DropCap</button>
@@ -694,7 +757,6 @@
     </div>
   </div>
 
-  <!-- VÙNG HIỂN THỊ CHỨA TOÀN BỘ CÁC TRANG NỐI TIẾP NHAU -->
   <div class="viewport" id="viewportArea">
     <div class="pages-container" id="pagesContainer">
       
@@ -778,6 +840,25 @@
     let currentMode = 'page';
     let nextFootnoteNumber = 3;
     let pageCount = 1;
+    let currentSkin = 'pastel'; // Mặc định là pastel xanh mây trời
+
+    // =========================================================================
+    // TÍNH NĂNG CHUYỂN SKIN GIAO DIỆN (PASTEL BLUE / DARK STUDIO)
+    // =========================================================================
+    function toggleThemeSkin() {
+      const body = document.body;
+      const btn = document.getElementById('themeSkinBtn');
+      if (currentSkin === 'pastel') {
+        body.classList.add('theme-dark');
+        currentSkin = 'dark';
+        btn.innerText = "🎨 Skin Tối";
+      } else {
+        body.classList.remove('theme-dark');
+        currentSkin = 'pastel';
+        btn.innerText = "🎨 Skin Xanh";
+      }
+      autoSavePreset();
+    }
 
     // CON LĂN CHUỘT TRƯỢT NGANG TRÊN PC
     const toolbarEl = document.getElementById('mainToolbar');
@@ -833,7 +914,6 @@
       }
     });
 
-    // TỰ ĐỘNG THU NHỎ TẤT CẢ CÁC TRANG VỪA VẶN MÀN HÌNH ĐIỆN THOẠI
     function autoFitMobile() {
       const viewport = document.getElementById('viewportArea');
       if (!viewport) return;
@@ -863,21 +943,16 @@
       autoFitMobile();
     });
 
-    // CHỌN TRANG ĐANG THAO TÁC KHI NGƯỜI DÙNG BẤM VÀO
     function setActivePage(stageEl) {
       document.querySelectorAll('.stage-wrapper').forEach(el => el.classList.remove('active-page'));
       stageEl.classList.add('active-page');
     }
 
-    // =========================================================================
-    // TÍNH NĂNG THÊM TRANG MỚI NỐI TIẾP PHÍA DƯỚI
-    // =========================================================================
     function addNewPage() {
       pageCount++;
       const container = document.getElementById('pagesContainer');
       const firstPageStage = container.querySelector('.stage-wrapper');
       
-      // Lấy tên sách & tác giả của trang 1 để đồng bộ sang trang mới
       const leftHeader = firstPageStage.querySelector('.header-left')?.innerText || "Luật quản lý thuế";
       const rightHeader = firstPageStage.querySelector('.header-right')?.innerText || "(c): Tên tác giả";
       const quoteBookTitle = firstPageStage.querySelector('.quote-title')?.innerText || "TỰA ĐỀ TRUYỆN";
@@ -945,12 +1020,9 @@
       
       applyAllTextEffects();
       setTimeout(autoFitMobile, 50);
-
-      // Cuộn êm xuống trang vừa tạo
       newSandbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // XÓA MỘT TRANG BẤT KỲ
     function deletePage(event, btnEl) {
       event.stopPropagation();
       const allSandboxes = document.querySelectorAll('.scale-sandbox');
@@ -963,7 +1035,6 @@
       const sandbox = btnEl.closest('.scale-sandbox');
       sandbox.remove();
       
-      // Chọn lại trang đầu tiên làm trang active
       const remaining = document.querySelectorAll('.stage-wrapper');
       if (remaining.length > 0) setActivePage(remaining[0]);
       setTimeout(autoFitMobile, 50);
@@ -1185,6 +1256,7 @@
         wet: document.getElementById('wetSlider').value,
         press: document.getElementById('pressSlider').value,
         glow: document.getElementById('glowSlider').value,
+        skin: currentSkin,
         pages: pagesData
       };
       localStorage.setItem('book_multipage_preset', JSON.stringify(data));
@@ -1192,7 +1264,7 @@
 
     function savePresetManual() {
       autoSavePreset();
-      alert("✅ Đã lưu toàn bộ các trang và định dạng!");
+      alert("✅ Đã lưu toàn bộ các trang và thiết lập!");
     }
 
     function loadSavedPreset() {
@@ -1200,6 +1272,16 @@
       if (!saved) return;
       try {
         const data = JSON.parse(saved);
+        if (data.skin) {
+          currentSkin = data.skin;
+          if (currentSkin === 'dark') {
+            document.body.classList.add('theme-dark');
+            document.getElementById('themeSkinBtn').innerText = "🎨 Skin Tối";
+          } else {
+            document.body.classList.remove('theme-dark');
+            document.getElementById('themeSkinBtn').innerText = "🎨 Skin Xanh";
+          }
+        }
         if (data.font) {
           document.getElementById('fontSelect').value = data.font;
           changeFont(data.font);
@@ -1228,7 +1310,6 @@
         if (data.press !== undefined) document.getElementById('pressSlider').value = data.press;
         if (data.glow !== undefined) document.getElementById('glowSlider').value = data.glow;
 
-        // Phục hồi lại toàn bộ danh sách các trang đã lưu
         if (data.pages && data.pages.length > 0) {
           const container = document.getElementById('pagesContainer');
           container.innerHTML = '';
@@ -1274,7 +1355,6 @@
       const supText = toSuperscript(input.trim());
       document.execCommand("insertText", false, supText);
 
-      // Thêm vào đúng phần chú thích của trang đang active
       const activeStage = document.querySelector('.stage-wrapper.active-page') || document.querySelector('.stage-wrapper');
       const footnotesBox = activeStage.querySelector('.footnotes');
       if (footnotesBox) {
@@ -1298,9 +1378,6 @@
       if (parentP) parentP.classList.add('has-dropcap');
     }
 
-    // =========================================================================
-    // LÕI KẾT XUẤT 1 TRANG SÁCH THÀNH ẢNH 4K SẮC NÉT
-    // =========================================================================
     async function renderPageToCanvas(pageEl) {
       const sandbox = pageEl.closest('.scale-sandbox');
       const prevTransform = sandbox.style.transform;
@@ -1376,7 +1453,6 @@
       return finalCanvas;
     }
 
-    // TẢI FILE CANVAS VỀ MÁY HOẶC MỞ MENU SHARE
     function downloadCanvas(canvas, fileName) {
       return new Promise((resolve) => {
         canvas.toBlob(async (blob) => {
@@ -1407,7 +1483,6 @@
       });
     }
 
-    // 1. TẢI ĐÚNG TRANG ĐANG CHỌN (ACTIVE PAGE)
     async function exportActivePage() {
       const activeStage = document.querySelector('.stage-wrapper.active-page') || document.querySelector('.stage-wrapper');
       if (!activeStage) return;
@@ -1432,7 +1507,6 @@
       }
     }
 
-    // 2. TẢI TẤT CẢ CÁC TRANG CÙNG LÚC
     async function exportAllPages() {
       const stages = document.querySelectorAll('.stage-wrapper');
       if (stages.length === 0) return;
@@ -1449,7 +1523,6 @@
           const canvas = await renderPageToCanvas(pageEl);
           const fileName = `${currentMode === 'quote' ? 'quote' : 'sach'}_Trang_${pageNum}_4K_${Date.now()}.png`;
           await downloadCanvas(canvas, fileName);
-          // Nghỉ 800ms giữa các trang để máy kịp giải phóng bộ nhớ RAM
           await new Promise(r => setTimeout(r, 800));
         }
         alert(`✅ Đã tải xuống toàn bộ ${stages.length} trang thành công!`);
