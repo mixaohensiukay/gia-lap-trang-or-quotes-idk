@@ -85,7 +85,7 @@
       padding-right: 0;
     }
 
-    .toolbar select, .toolbar button, .toolbar input[type="range"], .toolbar input[type="color"] {
+    .toolbar select, .toolbar button, .toolbar input[type="color"] {
       background: #2a2a32;
       color: #fff;
       border: 1px solid #40404c;
@@ -107,11 +107,61 @@
       overflow: hidden;
     }
 
-    .toolbar input[type="range"] {
+    /* BỘ ĐIỀU KHIỂN SỐ DẠNG STEPPER BẤM CHO ĐIỆN THOẠI */
+    .num-stepper {
+      display: inline-flex;
+      align-items: center;
+      background: #22222a;
+      border: 1px solid #3d3d4a;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 30px;
+    }
+
+    .num-stepper span.stepper-label {
+      padding: 0 5px;
+      font-size: 11.5px;
+      color: #aaa;
+      user-select: none;
+    }
+
+    .num-stepper button {
+      background: #2e2e38;
+      border: none;
+      color: #eee;
+      width: 24px;
+      height: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
       padding: 0;
-      height: 5px;
-      width: 48px;
-      cursor: ew-resize;
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    .num-stepper button:active {
+      background: #4f46e5;
+    }
+
+    .num-stepper input[type="number"] {
+      width: 38px;
+      height: 100%;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 12.5px;
+      text-align: center;
+      outline: none;
+      font-family: inherit;
+      -moz-appearance: textfield;
+    }
+
+    .num-stepper input[type="number"]::-webkit-outer-spin-button,
+    .num-stepper input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
 
     .toolbar button:hover { background: #3b3b47; }
@@ -464,26 +514,80 @@
         <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
         <button onclick="nextPage()" title="Tăng số trang và sang trang mới">📄 Trang Mới</button>
         <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D">📖 Gáy 3D</button>
-      </div>
-
-      <!-- NÚT TAB THỤT ĐẦU DÒNG CHO ĐIỆN THOẠI (MỚI) -->
-      <div class="toolbar-group">
         <button onmousedown="event.preventDefault()" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold; background: #3b3a4a;">⇥ Tab</button>
       </div>
 
-      <!-- Hiệu ứng chữ -->
+      <!-- BỘ ĐIỀU KHIỂN CỠ CHỮ & GIÃN DÒNG BẰNG STEPPER BẤM SỐ -->
       <div class="toolbar-group">
-        <label title="Kéo độ mực lem thớ giấy">Lem:<input type="range" id="bleedSlider" min="0" max="4.0" step="0.2" value="0" oninput="applyAllTextEffects()"></label>
-        <label title="Kéo độ đổ bóng mềm mại">Bóng:<input type="range" id="shadowSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()"></label>
-        <label title="Kéo độ đẫm mực bút máy">Ướt:<input type="range" id="wetSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()"></label>
-        <label title="Kéo độ dập chìm nhẹ">Ép:<input type="range" id="pressSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()"></label>
-        <label title="Kéo quầng sáng hào quang">Quang:<input type="range" id="glowSlider" min="0" max="15" step="0.5" value="0" oninput="applyAllTextEffects()"></label>
+        <div class="num-stepper" title="Cỡ chữ">
+          <span class="stepper-label">Cỡ</span>
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('fsInput', -0.5)">-</button>
+          <input type="number" id="fsInput" value="17.5" step="0.5" min="12" max="36" oninput="updateStyle('--font-size', this.value + 'px')">
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('fsInput', 0.5)">+</button>
+        </div>
+
+        <div class="num-stepper" title="Giãn khoảng cách dòng">
+          <span class="stepper-label">Dòng</span>
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('lhInput', -0.05)">-</button>
+          <input type="number" id="lhInput" value="1.55" step="0.05" min="1.0" max="2.6" oninput="updateStyle('--line-height', this.value)">
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('lhInput', 0.05)">+</button>
+        </div>
+
+        <div class="num-stepper" title="Giãn khoảng cách chữ">
+          <span class="stepper-label">Chữ</span>
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('lsInput', -0.2)">-</button>
+          <input type="number" id="lsInput" value="0" step="0.1" min="-1" max="4" oninput="updateStyle('--letter-spacing', this.value + 'px')">
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('lsInput', 0.2)">+</button>
+        </div>
+
+        <div class="num-stepper" title="Thụt lề đầu đoạn">
+          <span class="stepper-label">Lề</span>
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('tiInput', -0.2)">-</button>
+          <input type="number" id="tiInput" value="1.6" step="0.2" min="0" max="4" oninput="updateStyle('--text-indent', this.value + 'em')">
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('tiInput', 0.2)">+</button>
+        </div>
+      </div>
+
+      <!-- BỘ ĐIỀU KHIỂN HIỆU ỨNG BẰNG STEPPER BẤM SỐ -->
+      <div class="toolbar-group">
+        <div class="num-stepper" title="Mực lem xơ giấy">
+          <span class="stepper-label">Lem</span>
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('bleedSlider', -0.2); applyAllTextEffects();">-</button>
+          <input type="number" id="bleedSlider" value="0" step="0.2" min="0" max="4" oninput="applyAllTextEffects()">
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('bleedSlider', 0.2); applyAllTextEffects();">+</button>
+        </div>
+
+        <div class="num-stepper" title="Độ đổ bóng">
+          <span class="stepper-label">Bóng</span>
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('shadowSlider', -0.2); applyAllTextEffects();">-</button>
+          <input type="number" id="shadowSlider" value="0" step="0.2" min="0" max="5" oninput="applyAllTextEffects()">
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('shadowSlider', 0.2); applyAllTextEffects();">+</button>
+        </div>
+
+        <div class="num-stepper" title="Mực ướt đẫm">
+          <span class="stepper-label">Ướt</span>
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('wetSlider', -0.2); applyAllTextEffects();">-</button>
+          <input type="number" id="wetSlider" value="0" step="0.2" min="0" max="5" oninput="applyAllTextEffects()">
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('wetSlider', 0.2); applyAllTextEffects();">+</button>
+        </div>
+
+        <div class="num-stepper" title="Chữ dập chìm">
+          <span class="stepper-label">Ép</span>
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('pressSlider', -0.2); applyAllTextEffects();">-</button>
+          <input type="number" id="pressSlider" value="0" step="0.2" min="0" max="5" oninput="applyAllTextEffects()">
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('pressSlider', 0.2); applyAllTextEffects();">+</button>
+        </div>
+
+        <div class="num-stepper" title="Hào quang sáng quanh chữ">
+          <span class="stepper-label">Quang</span>
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('glowSlider', -1); applyAllTextEffects();">-</button>
+          <input type="number" id="glowSlider" value="0" step="1" min="0" max="20" oninput="applyAllTextEffects()">
+          <button onmousedown="event.preventDefault()" onclick="adjustStepper('glowSlider', 1); applyAllTextEffects();">+</button>
+        </div>
       </div>
 
       <!-- Giấy & Màu sắc -->
       <div class="toolbar-group">
-        <label title="Tối viền">Viền:<input type="range" min="0" max="0.3" step="0.02" value="0.08" oninput="updateStyle('--vignette-opacity', this.value)"></label>
-        <label title="Hạt giấy">Hạt:<input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)">
         <label title="Đổi màu nền">Nền:<input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)"></label>
         <label title="Đổi màu chữ">Chữ:<input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)"></label>
         <button onclick="setCustomText('#263b72')" style="color: #60a5fa; font-weight: bold;">#263b72</button>
@@ -501,14 +605,6 @@
           <option value="font-vietnam">Be Vietnam Pro (Sans nét)</option>
           <option value="font-helvetica">Helvetica (Quốc tế)</option>
         </select>
-      </div>
-
-      <!-- Cỡ chữ & Giãn dòng -->
-      <div class="toolbar-group">
-        <label title="Cỡ chữ">Cỡ:<input type="range" id="fsInput" min="13" max="32" step="0.5" value="17.5" oninput="updateStyle('--font-size', this.value + 'px')"></label>
-        <label title="Giãn dòng">Dòng:<input type="range" id="lhInput" min="1.1" max="2.4" step="0.05" value="1.55" oninput="updateStyle('--line-height', this.value)"></label>
-        <label title="Giãn chữ">Chữ:<input type="range" id="lsInput" min="-0.8" max="2.5" step="0.1" value="0" oninput="updateStyle('--letter-spacing', this.value + 'px')"></label>
-        <label title="Thụt lề">Lề:<input type="range" id="tiInput" min="0" max="3.5" step="0.2" value="1.6" oninput="updateStyle('--text-indent', this.value + 'em')"></label>
       </div>
 
       <!-- Căn lề & Highlight -->
@@ -599,27 +695,36 @@
     let currentMode = 'page';
     let nextFootnoteNumber = 3;
 
-    // =========================================================================
-    // LỌC SẠCH MỌI ĐỊNH DẠNG RÁC KHI DÁN (CHỈ GIỮ LẠI PLAIN TEXT 100%)
-    // =========================================================================
+    // HÀM TĂNG/GIẢM BẬC CHO STEPPER
+    function adjustStepper(id, delta) {
+      const input = document.getElementById(id);
+      if (!input) return;
+      let val = parseFloat(input.value) || 0;
+      val = Math.round((val + delta) * 100) / 100;
+      
+      const min = input.min !== '' ? parseFloat(input.min) : -999;
+      const max = input.max !== '' ? parseFloat(input.max) : 999;
+      val = Math.min(Math.max(val, min), max);
+      
+      input.value = val;
+      // Kích hoạt cập nhật
+      input.dispatchEvent(new Event('input'));
+    }
+
+    // LỌC CHỈ LẤY PLAIN TEXT KHI DÁN
     document.addEventListener('paste', function(e) {
       const active = document.activeElement;
       if (active && active.isContentEditable) {
         e.preventDefault();
-        // Lấy văn bản thô thuần túy từ clipboard
         const text = (e.clipboardData || window.clipboardData).getData('text/plain');
         if (text) {
-          // Chèn văn bản thô vào vị trí con trỏ
           document.execCommand('insertText', false, text);
         }
       }
     });
 
-    // =========================================================================
-    // NÚT TAB ẢO CHO ĐIỆN THOẠI & PHÍM TAB BÀN PHÍM
-    // =========================================================================
+    // NÚT TAB THỤT LỀ
     function insertTabIndent() {
-      // Chèn khoảng thụt lề chuẩn chữ in sách
       document.execCommand('insertHTML', false, '&emsp;&emsp;');
     }
 
@@ -696,11 +801,11 @@
     }
 
     function applyAllTextEffects() {
-      const bVal = parseFloat(document.getElementById('bleedSlider').value);
-      const sVal = parseFloat(document.getElementById('shadowSlider').value);
-      const wVal = parseFloat(document.getElementById('wetSlider').value);
-      const pVal = parseFloat(document.getElementById('pressSlider').value);
-      const gVal = parseFloat(document.getElementById('glowSlider').value);
+      const bVal = parseFloat(document.getElementById('bleedSlider').value) || 0;
+      const sVal = parseFloat(document.getElementById('shadowSlider').value) || 0;
+      const wVal = parseFloat(document.getElementById('wetSlider').value) || 0;
+      const pVal = parseFloat(document.getElementById('pressSlider').value) || 0;
+      const gVal = parseFloat(document.getElementById('glowSlider').value) || 0;
 
       const shadowLayers = [];
 
@@ -1004,7 +1109,7 @@
         sandbox.style.marginBottom = prevSandboxMargin;
 
         let finalCanvas = canvas;
-        const bVal = parseFloat(document.getElementById('bleedSlider').value);
+        const bVal = parseFloat(document.getElementById('bleedSlider').value) || 0;
 
         if (bVal > 0) {
           const bleedCanvas = document.createElement('canvas');
