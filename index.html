@@ -519,37 +519,37 @@
         <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
         <button onclick="nextPage()" title="Tăng số trang và sang trang mới">📄 Trang Mới</button>
         <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D (Chỉ áp dụng trang dài)">📖 Gáy 3D</button>
-        <button onmousedown="event.preventDefault()" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold; background: #3b3a4a;">⇥ Tab</button>
+        <button class="prevent-lose-focus" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold; background: #3b3a4a;">⇥ Tab</button>
       </div>
 
       <!-- Cỡ chữ & Giãn dòng -->
       <div class="toolbar-group">
         <div class="num-stepper" title="Cỡ chữ">
           <span class="stepper-label">Cỡ</span>
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('fsInput', -0.5)">-</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('fsInput', -0.5)">-</button>
           <input type="number" id="fsInput" value="17.5" step="0.5" min="12" max="36" oninput="updateStyle('--font-size', this.value + 'px')">
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('fsInput', 0.5)">+</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('fsInput', 0.5)">+</button>
         </div>
 
         <div class="num-stepper" title="Giãn khoảng cách dòng">
           <span class="stepper-label">Dòng</span>
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('lhInput', -0.05)">-</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('lhInput', -0.05)">-</button>
           <input type="number" id="lhInput" value="1.55" step="0.05" min="1.0" max="2.6" oninput="updateStyle('--line-height', this.value)">
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('lhInput', 0.05)">+</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('lhInput', 0.05)">+</button>
         </div>
 
         <div class="num-stepper" title="Giãn khoảng cách chữ">
           <span class="stepper-label">Chữ</span>
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('lsInput', -0.2)">-</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('lsInput', -0.2)">-</button>
           <input type="number" id="lsInput" value="0" step="0.1" min="-1" max="4" oninput="updateStyle('--letter-spacing', this.value + 'px')">
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('lsInput', 0.2)">+</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('lsInput', 0.2)">+</button>
         </div>
 
         <div class="num-stepper" title="Thụt lề đầu đoạn">
           <span class="stepper-label">Lề</span>
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('tiInput', -0.2)">-</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('tiInput', -0.2)">-</button>
           <input type="number" id="tiInput" value="1.6" step="0.2" min="0" max="4" oninput="updateStyle('--text-indent', this.value + 'em')">
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('tiInput', 0.2)">+</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('tiInput', 0.2)">+</button>
         </div>
       </div>
 
@@ -557,37 +557,37 @@
       <div class="toolbar-group">
         <div class="num-stepper" title="Mực lem xơ giấy">
           <span class="stepper-label">Lem</span>
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('bleedSlider', -0.2); applyAllTextEffects();">-</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('bleedSlider', -0.2); applyAllTextEffects();">-</button>
           <input type="number" id="bleedSlider" value="0" step="0.2" min="0" max="4" oninput="applyAllTextEffects()">
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('bleedSlider', 0.2); applyAllTextEffects();">+</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('bleedSlider', 0.2); applyAllTextEffects();">+</button>
         </div>
 
         <div class="num-stepper" title="Độ đổ bóng">
           <span class="stepper-label">Bóng</span>
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('shadowSlider', -0.2); applyAllTextEffects();">-</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('shadowSlider', -0.2); applyAllTextEffects();">-</button>
           <input type="number" id="shadowSlider" value="0" step="0.2" min="0" max="5" oninput="applyAllTextEffects()">
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('shadowSlider', 0.2); applyAllTextEffects();">+</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('shadowSlider', 0.2); applyAllTextEffects();">+</button>
         </div>
 
         <div class="num-stepper" title="Mực ướt đẫm">
           <span class="stepper-label">Ướt</span>
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('wetSlider', -0.2); applyAllTextEffects();">-</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('wetSlider', -0.2); applyAllTextEffects();">-</button>
           <input type="number" id="wetSlider" value="0" step="0.2" min="0" max="5" oninput="applyAllTextEffects()">
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('wetSlider', 0.2); applyAllTextEffects();">+</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('wetSlider', 0.2); applyAllTextEffects();">+</button>
         </div>
 
         <div class="num-stepper" title="Chữ dập chìm">
           <span class="stepper-label">Ép</span>
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('pressSlider', -0.2); applyAllTextEffects();">-</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('pressSlider', -0.2); applyAllTextEffects();">-</button>
           <input type="number" id="pressSlider" value="0" step="0.2" min="0" max="5" oninput="applyAllTextEffects()">
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('pressSlider', 0.2); applyAllTextEffects();">+</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('pressSlider', 0.2); applyAllTextEffects();">+</button>
         </div>
 
         <div class="num-stepper" title="Hào quang sáng quanh chữ">
           <span class="stepper-label">Quang</span>
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('glowSlider', -1); applyAllTextEffects();">-</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('glowSlider', -1); applyAllTextEffects();">-</button>
           <input type="number" id="glowSlider" value="0" step="1" min="0" max="20" oninput="applyAllTextEffects()">
-          <button onmousedown="event.preventDefault()" onclick="adjustStepper('glowSlider', 1); applyAllTextEffects();">+</button>
+          <button class="prevent-lose-focus" onclick="adjustStepper('glowSlider', 1); applyAllTextEffects();">+</button>
         </div>
       </div>
 
@@ -614,17 +614,22 @@
         </select>
       </div>
 
-      <!-- Căn lề & Highlight -->
+      <!-- CĂN LỀ & BỘ HIGHLIGHT KÈM NÚT XÓA ĐỊNH DẠNG -->
       <div class="toolbar-group">
-        <button class="btn-icon" onmousedown="event.preventDefault()" onclick="formatDoc('justifyFull')" title="Căn đều">≡</button>
-        <button class="btn-icon" onmousedown="event.preventDefault()" onclick="formatDoc('justifyCenter')" title="Căn giữa">≗</button>
-        <button class="btn-icon" onmousedown="event.preventDefault()" onclick="formatDoc('justifyLeft')" title="Căn trái">⇥</button>
-        <button class="btn-icon" onmousedown="event.preventDefault()" onclick="insertSceneBreak()" title="Phân cảnh">⁂</button>
-        <button onmousedown="event.preventDefault()" onclick="toggleFormatSpan('hl-yellow')">Vàng</button>
-        <button onmousedown="event.preventDefault()" onclick="toggleFormatSpan('hl-gray')">Xám</button>
-        <button onmousedown="event.preventDefault()" onclick="toggleFormatSpan('pencil-underline')">〰 Gạch đỏ</button>
-        <button onmousedown="event.preventDefault()" onclick="insertFootnoteMark()">Chú thích (¹)</button>
-        <button onmousedown="event.preventDefault()" onclick="applyDropCap()">🔤 DropCap</button>
+        <button class="btn-icon prevent-lose-focus" onclick="formatDoc('justifyFull')" title="Căn đều">≡</button>
+        <button class="btn-icon prevent-lose-focus" onclick="formatDoc('justifyCenter')" title="Căn giữa">≗</button>
+        <button class="btn-icon prevent-lose-focus" onclick="formatDoc('justifyLeft')" title="Căn trái">⇥</button>
+        <button class="btn-icon prevent-lose-focus" onclick="insertSceneBreak()" title="Phân cảnh">⁂</button>
+        
+        <button class="prevent-lose-focus" onclick="toggleFormatSpan('hl-yellow')">Vàng</button>
+        <button class="prevent-lose-focus" onclick="toggleFormatSpan('hl-gray')">Xám</button>
+        <button class="prevent-lose-focus" onclick="toggleFormatSpan('pencil-underline')">〰 Gạch đỏ</button>
+        
+        <!-- NÚT TẨY XÓA ĐỊNH DẠNG RIÊNG BIỆT DÀNH CHO MOBILE -->
+        <button class="prevent-lose-focus" onclick="clearHighlightFormatting()" title="Xóa toàn bộ màu Highlight & Gạch đỏ" style="background: #472a2a; border-color: #6e3535; color: #ff9b9b; font-weight: bold;">🧹 Xóa màu</button>
+        
+        <button class="prevent-lose-focus" onclick="insertFootnoteMark()">Chú thích (¹)</button>
+        <button class="prevent-lose-focus" onclick="applyDropCap()">🔤 DropCap</button>
       </div>
     </div>
   </div>
@@ -701,6 +706,14 @@
     let currentFont = 'font-garamond';
     let currentMode = 'page';
     let nextFootnoteNumber = 3;
+
+    // =========================================================================
+    // KHÓA CHỐNG MẤT CON TRỎ CHUỘT / MẤT BÔI ĐEN TRÊN MÀN HÌNH ĐIỆN THOẠI
+    // =========================================================================
+    document.querySelectorAll('.prevent-lose-focus').forEach(btn => {
+      btn.addEventListener('pointerdown', e => e.preventDefault());
+      btn.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+    });
 
     function adjustStepper(id, delta) {
       const input = document.getElementById(id);
@@ -898,27 +911,84 @@
       autoSavePreset();
     }
 
+    // =========================================================================
+    // HÀM BẬT/TẮT ĐỊNH DẠNG TƯƠNG THÍCH HOÀN TOÀN VỚI MÀN HÌNH ĐIỆN THOẠI
+    // =========================================================================
     function toggleFormatSpan(className) {
       const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      if (!selection.rangeCount) return;
 
       const range = selection.getRangeAt(0);
       let container = range.commonAncestorContainer;
       if (container.nodeType === 3) container = container.parentElement;
 
-      const existingSpan = container.closest('.' + className);
+      // Tìm xem có đang nằm trong thẻ định dạng này không
+      const targetSpan = container.closest('.' + className);
 
-      if (existingSpan) {
-        const parent = existingSpan.parentNode;
-        while (existingSpan.firstChild) {
-          parent.insertBefore(existingSpan.firstChild, existingSpan);
+      if (targetSpan) {
+        // Gỡ bỏ định dạng
+        const parent = targetSpan.parentNode;
+        while (targetSpan.firstChild) {
+          parent.insertBefore(targetSpan.firstChild, targetSpan);
         }
-        parent.removeChild(existingSpan);
+        parent.removeChild(targetSpan);
+        selection.removeAllRanges();
       } else {
+        if (selection.isCollapsed) return;
+        // Bọc thẻ định dạng mới
         const span = document.createElement("span");
         span.className = className;
         span.appendChild(range.extractContents());
         range.insertNode(span);
+      }
+      autoSavePreset();
+    }
+
+    // =========================================================================
+    // NÚT TẨY XÓA MỌI LOẠI HIGHLIGHT VÀ GẠCH ĐỎ (DÙNG ĐƯỢC CẢ KHI CHƯA KỊP BÔI ĐEN)
+    // =========================================================================
+    function clearHighlightFormatting() {
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+
+      const range = selection.getRangeAt(0);
+      let container = range.commonAncestorContainer;
+      if (container.nodeType === 3) container = container.parentElement;
+
+      // 1. Nếu người dùng đang đặt con trỏ chuột bên trong một từ có màu
+      const directTarget = container.closest('.hl-yellow, .hl-gray, .pencil-underline');
+      if (directTarget) {
+        const parent = directTarget.parentNode;
+        while (directTarget.firstChild) {
+          parent.insertBefore(directTarget.firstChild, directTarget);
+        }
+        parent.removeChild(directTarget);
+        autoSavePreset();
+        return;
+      }
+
+      // 2. Nếu người dùng đang bôi đen một đoạn dài
+      if (!selection.isCollapsed) {
+        const fragment = range.cloneContents();
+        const spans = fragment.querySelectorAll('.hl-yellow, .hl-gray, .pencil-underline');
+        
+        if (spans.length > 0) {
+          spans.forEach(s => {
+            const textNode = document.createTextNode(s.textContent);
+            s.parentNode.replaceChild(textNode, s);
+          });
+          range.deleteContents();
+          range.insertNode(fragment);
+        } else {
+          // Thao tác quét gỡ bao trùm
+          let parentSpan = container.closest('.hl-yellow, .hl-gray, .pencil-underline');
+          if (parentSpan) {
+            const p = parentSpan.parentNode;
+            while (parentSpan.firstChild) p.insertBefore(parentSpan.firstChild, parentSpan);
+            p.removeChild(parentSpan);
+          }
+        }
+        selection.removeAllRanges();
       }
       autoSavePreset();
     }
@@ -1062,9 +1132,6 @@
       if (parentP) parentP.classList.add('has-dropcap');
     }
 
-    // =========================================================================
-    // HÀM XUẤT ẢNH: ĐỒNG BỘ 4K SIÊU NÉT TRÊN CẢ ĐIỆN THOẠI LẪN MÁY TÍNH
-    // =========================================================================
     async function exportImage() {
       const sandbox = document.getElementById('scaleSandbox');
       const page = document.getElementById('page');
@@ -1078,7 +1145,6 @@
       const prevSandboxTransform = sandbox.style.transform;
       const prevSandboxMargin = sandbox.style.marginBottom;
       
-      // Đưa về tỉ lệ 1:1 trong tích tắc để chụp
       sandbox.style.transform = 'none';
       sandbox.style.marginBottom = '0px';
 
@@ -1127,9 +1193,6 @@
       page.style.textRendering = 'optimizeLegibility';
       page.style.webkitFontSmoothing = 'antialiased';
 
-      // =======================================================================
-      // CẤU HÌNH SCALE 4X (ĐỘ NÉT 4K ĐẠT ~2080px ĐẾN 2200px TRÊN MỌI THIẾT BỊ)
-      // =======================================================================
       const targetScale = 4.0;
 
       try {
@@ -1155,7 +1218,6 @@
         let finalCanvas = canvas;
         const bVal = parseFloat(document.getElementById('bleedSlider').value) || 0;
 
-        // Xử lý mực lem trên canvas tối ưu bộ nhớ
         if (bVal > 0) {
           try {
             const bleedCanvas = document.createElement('canvas');
@@ -1179,7 +1241,6 @@
 
         const fileName = (currentMode === 'quote' ? 'quote-wattpad-4K-' : 'trang-sach-4K-') + Date.now() + '.png';
 
-        // XUẤT FILE 4K TỐI ƯU
         finalCanvas.toBlob(async (blob) => {
           if (!blob) {
             fallbackDownload(finalCanvas.toDataURL('image/png'), fileName);
