@@ -2,7 +2,8 @@
 <html lang="vi" spellcheck="false">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Chống nhảy/phóng to giao diện bất thình lình trên màn hình cảm ứng -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Trình Tạo Trang Sách & Quote Giả Lập</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +31,7 @@
       --vignette-opacity: 0.08;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     
     body {
       background-color: var(--bg-editor);
@@ -39,36 +40,46 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 14px 12px 60px;
+      padding: 0 0 60px 0;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* THANH TOOLBAR TỐI ƯU CỰC MƯỢT TRÊN MOBILE (VUỐT NGANG) */
+    .toolbar-container {
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #18181c;
+      border-bottom: 1px solid #2d2d38;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
 
     .toolbar {
-      background: #1c1c20;
-      border: 1px solid #32323a;
-      border-radius: 12px;
-      padding: 10px 14px;
       display: flex;
       gap: 8px;
-      flex-wrap: wrap;
       align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 26px rgba(0,0,0,0.6);
-      position: sticky;
-      top: 10px;
-      z-index: 100;
-      max-width: 1400px;
+      padding: 10px 14px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; /* Ẩn thanh cuộn xấu xí */
+    }
+
+    .toolbar::-webkit-scrollbar {
+      display: none;
     }
 
     .toolbar-group {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 5px;
-      font-size: 12.5px;
+      gap: 6px;
+      font-size: 13px;
       color: #ddd;
       border-right: 1px solid #33333d;
-      padding-right: 7px;
+      padding-right: 8px;
+      flex-shrink: 0;
     }
 
     .toolbar-group:last-child {
@@ -80,17 +91,18 @@
       background: #2a2a32;
       color: #fff;
       border: 1px solid #40404c;
-      padding: 5px 8px;
+      padding: 6px 9px;
       border-radius: 6px;
-      font-size: 12.5px;
+      font-size: 13px;
       cursor: pointer;
       outline: none;
       transition: all 0.2s;
+      flex-shrink: 0;
     }
 
     .toolbar input[type="color"] {
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       padding: 0;
       border: none;
       border-radius: 50%;
@@ -100,7 +112,7 @@
     .toolbar input[type="range"] {
       padding: 0;
       height: 5px;
-      width: 44px;
+      width: 48px;
       cursor: ew-resize;
     }
 
@@ -109,6 +121,7 @@
       background: #2563eb;
       border-color: #1d4ed8;
       font-weight: 600;
+      padding: 6px 14px;
     }
     .toolbar button.primary:hover { background: #1d4ed8; }
 
@@ -127,15 +140,24 @@
 
     .btn-icon {
       font-size: 13px;
-      padding: 5px 8px !important;
+      padding: 6px 9px !important;
     }
 
+    /* VÙNG CHỨA SÁCH: TỰ ĐỘNG SCALE VỪA VẶN MỌI MÀN HÌNH ĐIỆN THOẠI */
     .viewport {
       width: 100%;
       display: flex;
       justify-content: center;
-      overflow-x: auto;
-      padding-bottom: 20px;
+      align-items: flex-start;
+      padding: 24px 10px 40px;
+      overflow: hidden;
+    }
+
+    .scale-sandbox {
+      transform-origin: top center;
+      display: flex;
+      justify-content: center;
+      transition: transform 0.1s ease-out;
     }
 
     .stage-wrapper {
@@ -159,8 +181,6 @@
       background: #111;
       border-radius: 4px;
       box-shadow: 0 16px 44px rgba(0,0,0,0.7);
-      transform-origin: top center;
-      transition: transform 0.15s ease-out;
     }
 
     .page {
@@ -201,7 +221,6 @@
       z-index: 5;
     }
 
-    /* MỞ RỘNG TOÀN BỘ KHÔNG GIAN BÓNG CHỮ ĐỂ KHÔNG BỊ CẮT XÉN */
     #pageLayoutArea, #quoteLayoutArea {
       position: relative;
       z-index: 4;
@@ -366,7 +385,6 @@
       margin-bottom: 12px;
     }
 
-    /* ĐÃ FIX: MỞ RỘNG KHÔNG GIAN BÓNG CHỮ VÀ ĐỆM AN TOÀN 2 BÊN */
     .quote-content {
       font-size: var(--font-size);
       line-height: var(--line-height);
@@ -376,8 +394,8 @@
       margin: auto 0;
       width: 100%;
       text-align: center;
-      overflow: visible !important; /* Không bao giờ cắt bóng chữ hay đuôi chữ nghiêng */
-      padding: 4px 10px; /* Khoảng thở an toàn 2 bên mép chữ */
+      overflow: visible !important;
+      padding: 4px 10px;
     }
     
     .quote-footer { width: 100%; outline: none; text-align: center; overflow: visible !important; }
@@ -435,163 +453,142 @@
     </defs>
   </svg>
 
-  <div class="toolbar">
-    <div class="toolbar-group">
-      <select id="modeSelect" class="highlight-select" onchange="switchMode(this.value)">
-        <option value="page">📄 Khổ trang dài</option>
-        <option value="quote">🔲 Quote vuông 1:1</option>
-      </select>
-    </div>
+  <!-- THANH TOOLBAR CỐ ĐỊNH, CUỘN VUỐT NGANG MƯỢT MÀ TRÊN MOBILE -->
+  <div class="toolbar-container">
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <select id="modeSelect" class="highlight-select" onchange="switchMode(this.value)">
+          <option value="page">📄 Khổ trang dài</option>
+          <option value="quote">🔲 Quote vuông 1:1</option>
+        </select>
+        <button class="primary" onclick="exportImage()">📸 Tải PNG</button>
+      </div>
 
-    <div class="toolbar-group">
-      <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
-      <button onclick="nextPage()" title="Tăng số trang và sang trang mới">📄 Trang Mới</button>
-      <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D">📖 Gáy 3D</button>
-    </div>
+      <div class="toolbar-group">
+        <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
+        <button onclick="nextPage()" title="Tăng số trang và sang trang mới">📄 Trang Mới</button>
+        <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D">📖 Gáy 3D</button>
+      </div>
 
-    <!-- BỘ 5 THANH TRƯỢT HIỆU ỨNG CHỮ -->
-    <div class="toolbar-group">
-      <label title="Kéo độ mực lem thớ giấy">Lem:
-        <input type="range" id="bleedSlider" min="0" max="4.0" step="0.2" value="0" oninput="applyAllTextEffects()">
-      </label>
-      <label title="Kéo độ đổ bóng mềm mại">Bóng:
-        <input type="range" id="shadowSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()">
-      </label>
-      <label title="Kéo độ đẫm mực bút máy">Ướt:
-        <input type="range" id="wetSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()">
-      </label>
-      <label title="Kéo độ dập chìm nhẹ">Ép:
-        <input type="range" id="pressSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()">
-      </label>
-      <label title="Kéo quầng sáng hào quang">Quang:
-        <input type="range" id="glowSlider" min="0" max="15" step="0.5" value="0" oninput="applyAllTextEffects()">
-      </label>
-    </div>
+      <!-- Hiệu ứng chữ -->
+      <div class="toolbar-group">
+        <label title="Kéo độ mực lem thớ giấy">Lem:<input type="range" id="bleedSlider" min="0" max="4.0" step="0.2" value="0" oninput="applyAllTextEffects()"></label>
+        <label title="Kéo độ đổ bóng mềm mại">Bóng:<input type="range" id="shadowSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()"></label>
+        <label title="Kéo độ đẫm mực bút máy">Ướt:<input type="range" id="wetSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()"></label>
+        <label title="Kéo độ dập chìm nhẹ">Ép:<input type="range" id="pressSlider" min="0" max="5.0" step="0.2" value="0" oninput="applyAllTextEffects()"></label>
+        <label title="Kéo quầng sáng hào quang">Quang:<input type="range" id="glowSlider" min="0" max="15" step="0.5" value="0" oninput="applyAllTextEffects()"></label>
+      </div>
 
-    <!-- Bề mặt giấy -->
-    <div class="toolbar-group">
-      <label title="Độ tối 4 góc trang sách">Tối viền:
-        <input type="range" min="0" max="0.3" step="0.02" value="0.08" oninput="updateStyle('--vignette-opacity', this.value)">
-      </label>
-      <label title="Độ sần hạt giấy">Hạt:
-        <input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)">
-      </label>
-    </div>
+      <!-- Giấy & Màu sắc -->
+      <div class="toolbar-group">
+        <label title="Tối viền">Viền:<input type="range" min="0" max="0.3" step="0.02" value="0.08" oninput="updateStyle('--vignette-opacity', this.value)"></label>
+        <label title="Hạt giấy">Hạt:<input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)"></label>
+        <label title="Đổi màu nền">Nền:<input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)"></label>
+        <label title="Đổi màu chữ">Chữ:<input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)"></label>
+        <button onclick="setCustomText('#263b72')" style="color: #60a5fa; font-weight: bold;">#263b72</button>
+      </div>
 
-    <!-- Font chữ -->
-    <div class="toolbar-group">
-      <select id="fontSelect" onchange="changeFont(this.value)">
-        <option value="font-alegreya">Alegreya (Thơ mộng)</option>
-        <option value="font-stix">STIX Two Text (Sắc sảo)</option>
-        <option value="font-garamond" selected>EB Garamond (Kinh điển)</option>
-        <option value="font-lora">Lora (Mềm mại)</option>
-        <option value="font-literata">Literata (Hiện đại)</option>
-        <option value="font-courier">Courier Prime (Đánh máy)</option>
-        <option value="font-vietnam">Be Vietnam Pro (Sans nét)</option>
-        <option value="font-helvetica">Helvetica (Quốc tế)</option>
-      </select>
-    </div>
+      <!-- Font chữ -->
+      <div class="toolbar-group">
+        <select id="fontSelect" onchange="changeFont(this.value)">
+          <option value="font-alegreya">Alegreya (Thơ mộng)</option>
+          <option value="font-stix">STIX Two Text (Sắc sảo)</option>
+          <option value="font-garamond" selected>EB Garamond (Kinh điển)</option>
+          <option value="font-lora">Lora (Mềm mại)</option>
+          <option value="font-literata">Literata (Hiện đại)</option>
+          <option value="font-courier">Courier Prime (Đánh máy)</option>
+          <option value="font-vietnam">Be Vietnam Pro (Sans nét)</option>
+          <option value="font-helvetica">Helvetica (Quốc tế)</option>
+        </select>
+      </div>
 
-    <!-- Màu sắc -->
-    <div class="toolbar-group">
-      <label title="Đổi màu nền">Nền:
-        <input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)">
-      </label>
-      <label title="Đổi màu chữ">Chữ:
-        <input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)">
-      </label>
-      <button onclick="setCustomText('#263b72')" style="color: #60a5fa; font-weight: bold;" title="Màu xanh mực bút máy">#263b72</button>
-    </div>
+      <!-- Cỡ chữ & Giãn dòng -->
+      <div class="toolbar-group">
+        <label title="Cỡ chữ">Cỡ:<input type="range" id="fsInput" min="13" max="32" step="0.5" value="17.5" oninput="updateStyle('--font-size', this.value + 'px')"></label>
+        <label title="Giãn dòng">Dòng:<input type="range" id="lhInput" min="1.1" max="2.4" step="0.05" value="1.55" oninput="updateStyle('--line-height', this.value)"></label>
+        <label title="Giãn chữ">Chữ:<input type="range" id="lsInput" min="-0.8" max="2.5" step="0.1" value="0" oninput="updateStyle('--letter-spacing', this.value + 'px')"></label>
+        <label title="Thụt lề">Lề:<input type="range" id="tiInput" min="0" max="3.5" step="0.2" value="1.6" oninput="updateStyle('--text-indent', this.value + 'em')"></label>
+      </div>
 
-    <!-- Cỡ chữ, Dòng, Chữ, Lề -->
-    <div class="toolbar-group">
-      <label title="Cỡ chữ">Cỡ:<input type="range" id="fsInput" min="13" max="32" step="0.5" value="17.5" oninput="updateStyle('--font-size', this.value + 'px')"></label>
-      <label title="Giãn dòng">Dòng:<input type="range" id="lhInput" min="1.1" max="2.4" step="0.05" value="1.55" oninput="updateStyle('--line-height', this.value)"></label>
-      <label title="Giãn chữ">Chữ:<input type="range" id="lsInput" min="-0.8" max="2.5" step="0.1" value="0" oninput="updateStyle('--letter-spacing', this.value + 'px')"></label>
-      <label title="Thụt lề">Lề:<input type="range" id="tiInput" min="0" max="3.5" step="0.2" value="1.6" oninput="updateStyle('--text-indent', this.value + 'em')"></label>
+      <!-- Căn lề & Highlight -->
+      <div class="toolbar-group">
+        <button class="btn-icon" onclick="formatDoc('justifyFull')" title="Căn đều">≡</button>
+        <button class="btn-icon" onclick="formatDoc('justifyCenter')" title="Căn giữa">≗</button>
+        <button class="btn-icon" onclick="formatDoc('justifyLeft')" title="Căn trái">⇥</button>
+        <button class="btn-icon" onclick="insertSceneBreak()" title="Phân cảnh">⁂</button>
+        <button onclick="toggleFormatSpan('hl-yellow')">Vàng</button>
+        <button onclick="toggleFormatSpan('hl-gray')">Xám</button>
+        <button onclick="toggleFormatSpan('pencil-underline')">〰 Gạch đỏ</button>
+        <button onclick="insertFootnoteMark()">Chú thích (¹)</button>
+        <button onclick="applyDropCap()">🔤 DropCap</button>
+      </div>
     </div>
-
-    <!-- Căn lề -->
-    <div class="toolbar-group">
-      <button class="btn-icon" onclick="formatDoc('justifyFull')" title="Căn đều">≡</button>
-      <button class="btn-icon" onclick="formatDoc('justifyCenter')" title="Căn giữa">≗</button>
-      <button class="btn-icon" onclick="formatDoc('justifyLeft')" title="Căn trái">⇥</button>
-      <button class="btn-icon" onclick="insertSceneBreak()" title="Chèn dấu hoa thị phân cảnh">⁂</button>
-    </div>
-
-    <!-- Highlight -->
-    <div class="toolbar-group">
-      <button onclick="toggleFormatSpan('hl-yellow')" title="Bật/Tắt Highlight vàng">Vàng</button>
-      <button onclick="toggleFormatSpan('hl-gray')" title="Bật/Tắt Highlight xám">Xám</button>
-      <button onclick="toggleFormatSpan('pencil-underline')" title="Bật/Tắt Gạch chân lượn sóng">〰 Gạch đỏ</button>
-      <button onclick="insertFootnoteMark()">Chú thích (¹)</button>
-      <button onclick="applyDropCap()">🔤 DropCap</button>
-    </div>
-
-    <button class="primary" onclick="exportImage()">📸 Tải PNG</button>
   </div>
 
-  <div class="viewport">
-    <div class="stage-wrapper">
-      <span class="crop-mark crop-tl"></span>
-      <span class="crop-mark crop-tr"></span>
-      <span class="crop-mark crop-bl"></span>
-      <span class="crop-mark crop-br"></span>
+  <!-- VÙNG HIỂN THỊ CÓ CONTAINER SCALE TỰ ĐỘNG THEO MÀN HÌNH -->
+  <div class="viewport" id="viewportArea">
+    <div class="scale-sandbox" id="scaleSandbox">
+      <div class="stage-wrapper" id="stageWrapper">
+        <span class="crop-mark crop-tl"></span>
+        <span class="crop-mark crop-tr"></span>
+        <span class="crop-mark crop-bl"></span>
+        <span class="crop-mark crop-br"></span>
 
-      <div class="book-wrapper" id="bookWrapper">
-        <div id="page" class="page mode-page font-garamond" spellcheck="false">
-          <div class="page-grain"></div>
-          <div class="page-vignette"></div>
-          
-          <div id="pageLayoutArea" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <div class="page-header">
-                <div id="headerLeft" class="header-left" contenteditable="true" onblur="autoSavePreset()">Luật quản lý thuế</div>
-                <div id="headerRight" class="header-right" contenteditable="true" onblur="autoSavePreset()">(c): Tên tác giả</div>
-              </div>
-              
-              <div id="chapterHeader" class="chapter-heading-box" contenteditable="true">
-                <div class="chapter-num">CHƯƠNG I</div>
-                <div class="chapter-title">Những Quy Định Chung</div>
-                <div class="chapter-divider"></div>
-              </div>
-
-              <div id="pageBody" class="page-body" contenteditable="true">
-                <p class="has-dropcap"><span class="dropcap">L</span>uật này quy định việc quản lý các loại thuế, các khoản thu khác thuộc ngân sách nhà nước.</p>
-                <p><span class="hl-yellow">Người nộp thuế bao gồm:</span></p>
-                <p class="scene-break">* * *</p>
-                <p>Giải thích từ ngữ:</p>
-                <p>Trong Luật này, các từ ngữ dưới đây được hiểu như sau:</p>
-                <p>Thuế là một khoản nộp ngân sách nhà nước bắt buộc của <span class="hl-gray">tổ chức, hộ gia đình, hộ kinh doanh, cá nhân theo quy định của các luật thuế.²</span></p>
-              </div>
-            </div>
-
-            <div>
-              <div id="pageFootnotes" class="footnotes" contenteditable="true">
-                <div>¹ Chú thích nè</div>
-                <div>² Là ví dụ nếu chú thích thì viết ở đây á</div>
-              </div>
-              <div id="pageNumber" class="page-number" contenteditable="true">1</div>
-            </div>
-          </div>
-
-          <!-- KHUNG QUOTE VUÔNG -->
-          <div id="quoteLayoutArea" class="quote-container" style="display: none;">
-            <div class="quote-mark">“</div>
+        <div class="book-wrapper" id="bookWrapper">
+          <div id="page" class="page mode-page font-garamond" spellcheck="false">
+            <div class="page-grain"></div>
+            <div class="page-vignette"></div>
             
-            <div id="quoteText" class="quote-content" contenteditable="true">
-              Người nộp thuế bao gồm:
-              <br>
-              Tổ chức, hộ gia đình, hộ kinh doanh, cá nhân nộp thuế theo quy định của pháp luật về thuế;
+            <div id="pageLayoutArea" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div class="page-header">
+                  <div id="headerLeft" class="header-left" contenteditable="true" onblur="autoSavePreset()">Luật quản lý thuế</div>
+                  <div id="headerRight" class="header-right" contenteditable="true" onblur="autoSavePreset()">(c): Tên tác giả</div>
+                </div>
+                
+                <div id="chapterHeader" class="chapter-heading-box" contenteditable="true">
+                  <div class="chapter-num">CHƯƠNG I</div>
+                  <div class="chapter-title">Những Quy Định Chung</div>
+                  <div class="chapter-divider"></div>
+                </div>
+
+                <div id="pageBody" class="page-body" contenteditable="true">
+                  <p class="has-dropcap"><span class="dropcap">L</span>uật này quy định việc quản lý các loại thuế, các khoản thu khác thuộc ngân sách nhà nước.</p>
+                  <p><span class="hl-yellow">Người nộp thuế bao gồm:</span></p>
+                  <p class="scene-break">* * *</p>
+                  <p>Giải thích từ ngữ:</p>
+                  <p>Trong Luật này, các từ ngữ dưới đây được hiểu như sau:</p>
+                  <p>Thuế là một khoản nộp ngân sách nhà nước bắt buộc của <span class="hl-gray">tổ chức, hộ gia đình, hộ kinh doanh, cá nhân theo quy định của các luật thuế.²</span></p>
+                </div>
+              </div>
+
+              <div>
+                <div id="pageFootnotes" class="footnotes" contenteditable="true">
+                  <div>¹ Chú thích nè</div>
+                  <div>² Là ví dụ nếu chú thích thì viết ở đây á</div>
+                </div>
+                <div id="pageNumber" class="page-number" contenteditable="true">1</div>
+              </div>
             </div>
 
-            <div class="quote-footer">
-              <div class="quote-divider"></div>
-              <div id="quoteBookTitle" class="quote-title" contenteditable="true">TỰA ĐỀ TRUYỆN</div>
-              <div id="quoteAuthor" class="quote-sub" contenteditable="true">Tác giả • Trích chương xx</div>
+            <!-- KHUNG QUOTE VUÔNG -->
+            <div id="quoteLayoutArea" class="quote-container" style="display: none;">
+              <div class="quote-mark">“</div>
+              
+              <div id="quoteText" class="quote-content" contenteditable="true">
+                Người nộp thuế bao gồm:
+                <br>
+                Tổ chức, hộ gia đình, hộ kinh doanh, cá nhân nộp thuế theo quy định của pháp luật về thuế;
+              </div>
+
+              <div class="quote-footer">
+                <div class="quote-divider"></div>
+                <div id="quoteBookTitle" class="quote-title" contenteditable="true">TỰA ĐỀ TRUYỆN</div>
+                <div id="quoteAuthor" class="quote-sub" contenteditable="true">Tác giả • Trích chương xx</div>
+              </div>
             </div>
+
           </div>
-
         </div>
       </div>
     </div>
@@ -602,8 +599,33 @@
     let currentMode = 'page';
     let nextFootnoteNumber = 3;
 
+    // =========================================================================
+    // THUẬT TOÁN AUTO-FIT RESPONSIVE DÀNH RIÊNG CHO ĐIỆN THOẠI
+    // =========================================================================
+    function autoFitMobile() {
+      const viewport = document.getElementById('viewportArea');
+      const sandbox = document.getElementById('scaleSandbox');
+      const stage = document.getElementById('stageWrapper');
+      if (!viewport || !sandbox || !stage) return;
+
+      const availWidth = viewport.clientWidth - 24; // Trừ khoảng lề 2 bên
+      const stageWidth = stage.offsetWidth;
+
+      if (availWidth < stageWidth) {
+        // Tự động thu nhỏ theo tỷ lệ vừa vặn màn hình điện thoại
+        const scale = availWidth / stageWidth;
+        sandbox.style.transform = `scale(${scale})`;
+        sandbox.style.marginBottom = `-${(stage.offsetHeight * (1 - scale))}px`;
+      } else {
+        sandbox.style.transform = 'none';
+        sandbox.style.marginBottom = '0px';
+      }
+    }
+
+    window.addEventListener('resize', autoFitMobile);
     window.addEventListener('DOMContentLoaded', () => {
       loadSavedPreset();
+      autoFitMobile();
     });
 
     function switchMode(mode) {
@@ -633,6 +655,7 @@
         }
       }
       applyAllTextEffects();
+      setTimeout(autoFitMobile, 50);
     }
 
     function toggleSpine() {
@@ -900,12 +923,19 @@
       if (parentP) parentP.classList.add('has-dropcap');
     }
 
+    // =========================================================================
+    // XUẤT ẢNH: TỰ ĐỘNG TẠM NGƯNG SCALE ĐỂ ẢNH ĐẠT CHẤT LƯỢNG 4K CỰC ĐẠI
+    // =========================================================================
     function exportImage() {
-      const wrapper = document.getElementById('bookWrapper');
+      const sandbox = document.getElementById('scaleSandbox');
       const page = document.getElementById('page');
       
-      const prevTransform = wrapper.style.transform;
-      wrapper.style.transform = 'none';
+      const prevSandboxTransform = sandbox.style.transform;
+      const prevSandboxMargin = sandbox.style.marginBottom;
+      
+      // Đưa scale về chuẩn 1:1 trong lúc chụp để ảnh nét căng
+      sandbox.style.transform = 'none';
+      sandbox.style.marginBottom = '0px';
 
       const pageRect = page.getBoundingClientRect();
       const highlightSpans = page.querySelectorAll('.hl-yellow, .hl-gray');
@@ -953,7 +983,10 @@
       }).then(canvas => {
         tempBgElements.forEach(el => el.remove());
         modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
-        wrapper.style.transform = prevTransform;
+        
+        // Khôi phục lại kích thước hiển thị trên điện thoại
+        sandbox.style.transform = prevSandboxTransform;
+        sandbox.style.marginBottom = prevSandboxMargin;
 
         let finalCanvas = canvas;
         const bVal = parseFloat(document.getElementById('bleedSlider').value);
@@ -983,7 +1016,8 @@
       }).catch(err => {
         tempBgElements.forEach(el => el.remove());
         modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
-        wrapper.style.transform = prevTransform;
+        sandbox.style.transform = prevSandboxTransform;
+        sandbox.style.marginBottom = prevSandboxMargin;
         console.error(err);
         alert("Có lỗi khi tạo ảnh, bà thử lại nha!");
       });
