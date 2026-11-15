@@ -1048,13 +1048,22 @@
       if (parentP) parentP.classList.add('has-dropcap');
     }
 
-    function exportImage() {
+   // =========================================================================
+    // HÀM XUẤT ẢNH HOÀN HẢO CHO CẢ ĐIỆN THOẠI LẪN MÁY TÍNH
+    // =========================================================================
+    async function exportImage() {
       const sandbox = document.getElementById('scaleSandbox');
       const page = document.getElementById('page');
+      const exportBtn = document.querySelector('button.primary');
       
+      const originalBtnText = exportBtn.innerText;
+      exportBtn.innerText = "⏳ Đang tạo...";
+      exportBtn.disabled = true;
+
       const prevSandboxTransform = sandbox.style.transform;
       const prevSandboxMargin = sandbox.style.marginBottom;
       
+      // Tạm đưa scale về chuẩn 1:1 trong tích tắc để chụp
       sandbox.style.transform = 'none';
       sandbox.style.marginBottom = '0px';
 
@@ -1063,6 +1072,7 @@
       const tempBgElements = [];
       const modifiedSpans = [];
 
+      // Tách lớp Highlight lót bên dưới chống lỗi tràn mép
       highlightSpans.forEach(span => {
         const range = document.createRange();
         range.selectNodeContents(span);
@@ -1097,50 +1107,118 @@
       page.style.textRendering = 'optimizeLegibility';
       page.style.webkitFontSmoothing = 'antialiased';
 
-      html2canvas(page, {
-        scale: 4,
-        useCORS: true,
-        backgroundColor: null
-      }).then(canvas => {
+      // Nhận diện điện thoại để chỉnh scale vừa vặn không bị tràn RAM
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+      const renderScale = isMobile ? 2.2 : 3.5; 
+
+      try {
+        const canvas = await html2canvas(page, {
+          scale: renderScale,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: null,
+          logging: false
+        });
+
+        // Khôi phục giao diện màn hình ngay lập tức
         tempBgElements.forEach(el => el.remove());
         modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
-        
         sandbox.style.transform = prevSandboxTransform;
         sandbox.style.marginBottom = prevSandboxMargin;
 
         let finalCanvas = canvas;
         const bVal = parseFloat(document.getElementById('bleedSlider').value) || 0;
 
+        // Xử lý mực lem an toàn
         if (bVal > 0) {
-          const bleedCanvas = document.createElement('canvas');
-          bleedCanvas.width = canvas.width;
-          bleedCanvas.height = canvas.height;
-          const bCtx = bleedCanvas.getContext('2d');
+          try {
+            const bleedCanvas = document.createElement('canvas');
+            bleedCanvas.width = canvas.width;
+            bleedCanvas.height = canvas.height;
+            const bCtx = bleedCanvas.getContext('2d');
 
-          bCtx.filter = 'url(#ink-bleed-filter-4k)';
-          bCtx.drawImage(canvas, 0, 0);
-
-          if (bCtx.filter === 'none' || !bCtx.filter) {
-            bCtx.clearRect(0, 0, canvas.width, canvas.height);
-            bCtx.filter = 'contrast(120%) blur(0.8px)';
+            bCtx.filter = 'url(#ink-bleed-filter-4k)';
             bCtx.drawImage(canvas, 0, 0);
+
+            if (bCtx.filter === 'none' || !bCtx.filter) {
+              bCtx.clearRect(0, 0, canvas.width, canvas.height);
+              bCtx.filter = 'contrast(120%) blur(0.8px)';
+              bCtx.drawImage(canvas, 0, 0);
+            }
+            finalCanvas = bleedCanvas;
+          } catch (e) {
+            finalCanvas = canvas; // Dự phòng an toàn nếu lỗi filter
           }
-          finalCanvas = bleedCanvas;
         }
 
-        const link = document.createElement('a');
-        const prefix = (currentMode === 'quote') ? 'quote-wattpad-' : 'trang-sach-';
-        link.download = prefix + Date.now() + '.png';
-        link.href = finalCanvas.toDataURL('image/png');
-        link.click();
-      }).catch(err => {
+        const fileName = (currentMode === 'quote' ? 'quote-wattpad-' : 'trang-sach-') + Date.now() + '.png';
+
+        // XUẤT FILE AN TOÀN TRÊN MOBILE
+        finalCanvas.toBlob(async (blob) => {
+          if (!blob) {
+            fallbackDownload(finalCanvas.toDataURL('image/png'), fileName);
+            return;
+          }
+
+          // 1. Thử dùng tính năng chia sẻ gốc của iPhone / Android (Lưu thẳng vào thư viện ảnh)
+          const file = new File([blob], fileName, { type: 'image/png' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                files: [file],
+                title: 'Trang sách / Quote'
+              });
+              exportBtn.innerText = originalBtnText;
+              exportBtn.disabled = false;
+              return;
+            } catch (shareErr) {
+              // Người dùng bấm hủy share thì tiếp tục tải bình thường
+            }
+          }
+
+          // 2. Tải qua Blob URL (Chuẩn cho Chrome & Firefox)
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = fileName;
+          link.href = blobUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+
+          exportBtn.innerText = originalBtnText;
+          exportBtn.disabled = false;
+        }, 'image/png');
+
+      } catch (err) {
         tempBgElements.forEach(el => el.remove());
         modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
         sandbox.style.transform = prevSandboxTransform;
         sandbox.style.marginBottom = prevSandboxMargin;
+        exportBtn.innerText = originalBtnText;
+        exportBtn.disabled = false;
         console.error(err);
-        alert("Có lỗi khi tạo ảnh, bà thử lại nha!");
-      });
+        alert("Có lỗi khi tạo ảnh trên điện thoại, bà thử bấm lại lần nữa nha!");
+      }
+    }
+
+    // Hàm dự phòng: Mở ảnh lên tab mới nếu điện thoại chặn tự động tải
+    function fallbackDownload(dataUrl, fileName) {
+      const img = new Image();
+      img.src = dataUrl;
+      const w = window.open("");
+      if (w) {
+        w.document.write("<p style='text-align:center;font-family:sans-serif;'>Chạm giữ vào ảnh bên dưới rồi chọn <b>Lưu hình ảnh</b> nhé:</p>");
+        w.document.write(img.outerHTML);
+      } else {
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = dataUrl;
+        link.click();
+      }
+      const exportBtn = document.querySelector('button.primary');
+      exportBtn.innerText = "📸 Tải PNG";
+      exportBtn.disabled = false;
     }
   </script>
 </body>
