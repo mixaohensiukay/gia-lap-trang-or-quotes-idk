@@ -4,13 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Trình Tạo Trang Sách & Quote Giả Lập</title>
-  <!-- Open Graph / Facebook / Zalo / Threads -->
+  
   <meta property="og:type" content="website">
   <meta property="og:title" content="Book & Quote Mockup Studio">
   <meta property="og:description" content="Tạo trang sách in & Quote vuông 1:1 phong cách Wattpad chuẩn 4K">
   <meta property="og:image" content="https://mixaohensiukay.github.io/gia-lap-trang-or-quotes-idk/preview.png">
 
-  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Book & Quote Mockup Studio">
   <meta name="twitter:description" content="Tạo trang sách in & Quote vuông 1:1 phong cách Wattpad chuẩn 4K">
@@ -56,7 +55,6 @@
       overflow-x: hidden;
     }
 
-    /* THANH TOOLBAR THIẾT KẾ LAI: MOBILE THÌ CUỘN VUỐT NGANG, PC THÌ MỞ BUNG GỌN GÀNG */
     .toolbar-container {
       width: 100%;
       position: sticky;
@@ -83,7 +81,6 @@
       scrollbar-color: #3f3f4c transparent;
     }
 
-    /* TỐI ƯU CHO PC (MÀN HÌNH RỘNG): TỰ BUNG TẤT CẢ TÍNH NĂNG KHÔNG CẦN KÉO CHUỘT */
     @media (min-width: 1024px) {
       .toolbar {
         flex-wrap: wrap;
@@ -173,13 +170,8 @@
       cursor: pointer;
     }
 
-    .num-stepper button:hover {
-      background: #3f3f4c;
-    }
-
-    .num-stepper button:active {
-      background: #4f46e5;
-    }
+    .num-stepper button:hover { background: #3f3f4c; }
+    .num-stepper button:active { background: #4f46e5; }
 
     .num-stepper input[type="number"] {
       width: 38px;
@@ -227,13 +219,21 @@
       padding: 6px 9px !important;
     }
 
+    /* VÙNG DANH SÁCH CÁC TRANG */
     .viewport {
       width: 100%;
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      flex-direction: column;
+      align-items: center;
       padding: 24px 10px 40px;
-      overflow: hidden;
+    }
+
+    .pages-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      width: 100%;
     }
 
     .scale-sandbox {
@@ -241,11 +241,39 @@
       display: flex;
       justify-content: center;
       transition: transform 0.1s ease-out;
+      width: 100%;
     }
 
     .stage-wrapper {
       position: relative;
       padding: 14px;
+      transition: outline 0.2s;
+    }
+
+    /* Đánh dấu trang đang được người dùng bấm chọn */
+    .stage-wrapper.active-page {
+      outline: 2px dashed #4f46e5;
+      outline-offset: 4px;
+      border-radius: 8px;
+    }
+
+    .page-control-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #888;
+      font-weight: 600;
+    }
+
+    .btn-delete-page {
+      background: #3b1e1e !important;
+      color: #ff8888 !important;
+      border: 1px solid #5a2e2e !important;
+      padding: 2px 8px !important;
+      font-size: 11px !important;
+      border-radius: 4px !important;
     }
 
     .crop-mark {
@@ -303,14 +331,10 @@
       z-index: 5;
     }
 
-    .page.mode-quote::after {
-      display: none !important;
-    }
-    .page.mode-quote .page-vignette {
-      display: none !important;
-    }
+    .page.mode-quote::after { display: none !important; }
+    .page.mode-quote .page-vignette { display: none !important; }
 
-    #pageLayoutArea, #quoteLayoutArea {
+    .pageLayoutArea, .quoteLayoutArea {
       position: relative;
       z-index: 4;
       overflow: visible !important;
@@ -550,13 +574,15 @@
           <option value="page">📄 Khổ trang dài</option>
           <option value="quote">🔲 Quote vuông 1:1</option>
         </select>
-        <button class="primary" onclick="exportImage()">📸 Tải PNG (4K)</button>
+        <!-- HAI LỰA CHỌN TẢI: TẢI TRANG ĐANG CHỌN HOẶC TẢI TẤT CẢ -->
+        <button class="primary" onclick="exportActivePage()">📸 Tải trang đang chọn</button>
+        <button class="primary" style="background:#059669;border-color:#047857;" onclick="exportAllPages()">📦 Tải TẤT CẢ trang</button>
       </div>
 
-      <!-- Nhóm 2: Dự án & Lề -->
+      <!-- Nhóm 2: Dự án & Thêm trang mới -->
       <div class="toolbar-group">
-        <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
-        <button onclick="nextPage()" title="Tăng số trang và sang trang mới">📄 Trang Mới</button>
+        <button onclick="savePresetManual()" title="Lưu lại toàn bộ các trang và định dạng">💾 Lưu</button>
+        <button onclick="addNewPage()" title="Thêm một trang mới nằm tiếp theo phía dưới" style="font-weight:bold;color:#60a5fa;">➕ Thêm Trang</button>
         <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D (Chỉ áp dụng trang dài)">📖 Gáy 3D</button>
         <button class="prevent-lose-focus" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold; background: #3b3a4a;">⇥ Tab</button>
       </div>
@@ -668,71 +694,82 @@
     </div>
   </div>
 
+  <!-- VÙNG HIỂN THỊ CHỨA TOÀN BỘ CÁC TRANG NỐI TIẾP NHAU -->
   <div class="viewport" id="viewportArea">
-    <div class="scale-sandbox" id="scaleSandbox">
-      <div class="stage-wrapper" id="stageWrapper">
-        <span class="crop-mark crop-tl"></span>
-        <span class="crop-mark crop-tr"></span>
-        <span class="crop-mark crop-bl"></span>
-        <span class="crop-mark crop-br"></span>
+    <div class="pages-container" id="pagesContainer">
+      
+      <!-- TRANG ĐẦU TIÊN (MẶC ĐỊNH LÀ ACTIVE) -->
+      <div class="scale-sandbox">
+        <div class="stage-wrapper active-page" onclick="setActivePage(this)">
+          <div class="page-control-bar">
+            <span>TRANG 1</span>
+            <button class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
+          </div>
 
-        <div class="book-wrapper" id="bookWrapper">
-          <div id="page" class="page mode-page font-garamond" spellcheck="false">
-            <div class="page-grain"></div>
-            <div class="page-vignette"></div>
-            
-            <div id="pageLayoutArea" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <div class="page-header">
-                  <div id="headerLeft" class="header-left" contenteditable="true" onblur="autoSavePreset()">Luật quản lý thuế</div>
-                  <div id="headerRight" class="header-right" contenteditable="true" onblur="autoSavePreset()">(c): Tên tác giả</div>
-                </div>
-                
-                <div id="chapterHeader" class="chapter-heading-box" contenteditable="true">
-                  <div class="chapter-num">CHƯƠNG I</div>
-                  <div class="chapter-title">Những Quy Định Chung</div>
-                  <div class="chapter-divider"></div>
-                </div>
+          <span class="crop-mark crop-tl"></span>
+          <span class="crop-mark crop-tr"></span>
+          <span class="crop-mark crop-bl"></span>
+          <span class="crop-mark crop-br"></span>
 
-                <div id="pageBody" class="page-body" contenteditable="true">
-                  <p class="has-dropcap"><span class="dropcap">L</span>uật này quy định việc quản lý các loại thuế, các khoản thu khác thuộc ngân sách nhà nước.</p>
-                  <p><span class="hl-yellow">Người nộp thuế bao gồm:</span></p>
-                  <p class="scene-break">* * *</p>
-                  <p>Giải thích từ ngữ:</p>
-                  <p>Trong Luật này, các từ ngữ dưới đây được hiểu như sau:</p>
-                  <p>Thuế là một khoản nộp ngân sách nhà nước bắt buộc của <span class="hl-gray">tổ chức, hộ gia đình, hộ kinh doanh, cá nhân theo quy định của các luật thuế.²</span></p>
-                </div>
-              </div>
-
-              <div>
-                <div id="pageFootnotes" class="footnotes" contenteditable="true">
-                  <div>¹ Chú thích nè</div>
-                  <div>² Là ví dụ nếu chú thích thì viết ở đây á</div>
-                </div>
-                <div id="pageNumber" class="page-number" contenteditable="true">1</div>
-              </div>
-            </div>
-
-            <!-- KHUNG QUOTE VUÔNG -->
-            <div id="quoteLayoutArea" class="quote-container" style="display: none;">
-              <div class="quote-mark">“</div>
+          <div class="book-wrapper">
+            <div class="page mode-page font-garamond" spellcheck="false">
+              <div class="page-grain"></div>
+              <div class="page-vignette"></div>
               
-              <div id="quoteText" class="quote-content" contenteditable="true">
-                Người nộp thuế bao gồm:
-                <br>
-                Tổ chức, hộ gia đình, hộ kinh doanh, cá nhân nộp thuế theo quy định của pháp luật về thuế;
+              <div class="pageLayoutArea" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div class="page-header">
+                    <div class="header-left" contenteditable="true">Luật quản lý thuế</div>
+                    <div class="header-right" contenteditable="true">(c): Tên tác giả</div>
+                  </div>
+                  
+                  <div class="chapter-heading-box" contenteditable="true">
+                    <div class="chapter-num">CHƯƠNG I</div>
+                    <div class="chapter-title">Những Quy Định Chung</div>
+                    <div class="chapter-divider"></div>
+                  </div>
+
+                  <div class="page-body" contenteditable="true">
+                    <p class="has-dropcap"><span class="dropcap">L</span>uật này quy định việc quản lý các loại thuế, các khoản thu khác thuộc ngân sách nhà nước.</p>
+                    <p><span class="hl-yellow">Người nộp thuế bao gồm:</span></p>
+                    <p class="scene-break">* * *</p>
+                    <p>Giải thích từ ngữ:</p>
+                    <p>Trong Luật này, các từ ngữ dưới đây được hiểu như sau:</p>
+                    <p>Thuế là một khoản nộp ngân sách nhà nước bắt buộc của <span class="hl-gray">tổ chức, hộ gia đình, hộ kinh doanh, cá nhân theo quy định của các luật thuế.²</span></p>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="footnotes" contenteditable="true">
+                    <div>¹ Chú thích nè</div>
+                    <div>² Là ví dụ nếu chú thích thì viết ở đây á</div>
+                  </div>
+                  <div class="page-number" contenteditable="true">1</div>
+                </div>
               </div>
 
-              <div class="quote-footer">
-                <div class="quote-divider"></div>
-                <div id="quoteBookTitle" class="quote-title" contenteditable="true">TỰA ĐỀ TRUYỆN</div>
-                <div id="quoteAuthor" class="quote-sub" contenteditable="true">Tác giả • Trích chương xx</div>
+              <!-- KHUNG QUOTE VUÔNG -->
+              <div class="quoteLayoutArea quote-container" style="display: none;">
+                <div class="quote-mark">“</div>
+                
+                <div class="quote-content" contenteditable="true">
+                  Người nộp thuế bao gồm:
+                  <br>
+                  Tổ chức, hộ gia đình, hộ kinh doanh, cá nhân nộp thuế theo quy định của pháp luật về thuế;
+                </div>
+
+                <div class="quote-footer">
+                  <div class="quote-divider"></div>
+                  <div class="quote-title" contenteditable="true">TỰA ĐỀ TRUYỆN</div>
+                  <div class="quote-sub" contenteditable="true">Tác giả • Trích chương xx</div>
+                </div>
               </div>
+
             </div>
-
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -740,14 +777,12 @@
     let currentFont = 'font-garamond';
     let currentMode = 'page';
     let nextFootnoteNumber = 3;
+    let pageCount = 1;
 
-    // =========================================================================
-    // TỰ ĐỘNG CHUYỂN CON LĂN CHUỘT DỌC THÀNH CUỘN NGANG KHI Ở TRÊN THANH CÔNG CỤ PC
-    // =========================================================================
+    // CON LĂN CHUỘT TRƯỢT NGANG TRÊN PC
     const toolbarEl = document.getElementById('mainToolbar');
     if (toolbarEl) {
       toolbarEl.addEventListener('wheel', (e) => {
-        // Chỉ kích hoạt khi màn hình đang có thanh cuộn ngang
         if (toolbarEl.scrollWidth > toolbarEl.clientWidth) {
           e.preventDefault();
           toolbarEl.scrollLeft += e.deltaY;
@@ -755,7 +790,7 @@
       }, { passive: false });
     }
 
-    // KHÓA CHỐNG MẤT CON TRỎ CHUỘT / MẤT BÔI ĐEN TRÊN MÀN HÌNH ĐIỆN THOẠI
+    // CHỐNG MẤT VÙNG CHỌN TRÊN MOBILE
     document.querySelectorAll('.prevent-lose-focus').forEach(btn => {
       btn.addEventListener('pointerdown', e => e.preventDefault());
       btn.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
@@ -780,9 +815,7 @@
       if (active && active.isContentEditable) {
         e.preventDefault();
         const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-        if (text) {
-          document.execCommand('insertText', false, text);
-        }
+        if (text) document.execCommand('insertText', false, text);
       }
     });
 
@@ -800,23 +833,28 @@
       }
     });
 
+    // TỰ ĐỘNG THU NHỎ TẤT CẢ CÁC TRANG VỪA VẶN MÀN HÌNH ĐIỆN THOẠI
     function autoFitMobile() {
       const viewport = document.getElementById('viewportArea');
-      const sandbox = document.getElementById('scaleSandbox');
-      const stage = document.getElementById('stageWrapper');
-      if (!viewport || !sandbox || !stage) return;
+      if (!viewport) return;
 
       const availWidth = viewport.clientWidth - 20;
-      const stageWidth = stage.offsetWidth;
+      const sandboxes = document.querySelectorAll('.scale-sandbox');
 
-      if (availWidth < stageWidth) {
-        const scale = availWidth / stageWidth;
-        sandbox.style.transform = `scale(${scale})`;
-        sandbox.style.marginBottom = `-${(stage.offsetHeight * (1 - scale))}px`;
-      } else {
-        sandbox.style.transform = 'none';
-        sandbox.style.marginBottom = '0px';
-      }
+      sandboxes.forEach(sb => {
+        const stage = sb.querySelector('.stage-wrapper');
+        if (!stage) return;
+        const stageWidth = stage.offsetWidth || 550;
+
+        if (availWidth < stageWidth) {
+          const scale = availWidth / stageWidth;
+          sb.style.transform = `scale(${scale})`;
+          sb.style.marginBottom = `-${(stage.offsetHeight * (1 - scale))}px`;
+        } else {
+          sb.style.transform = 'none';
+          sb.style.marginBottom = '0px';
+        }
+      });
     }
 
     window.addEventListener('resize', autoFitMobile);
@@ -825,50 +863,156 @@
       autoFitMobile();
     });
 
+    // CHỌN TRANG ĐANG THAO TÁC KHI NGƯỜI DÙNG BẤM VÀO
+    function setActivePage(stageEl) {
+      document.querySelectorAll('.stage-wrapper').forEach(el => el.classList.remove('active-page'));
+      stageEl.classList.add('active-page');
+    }
+
+    // =========================================================================
+    // TÍNH NĂNG THÊM TRANG MỚI NỐI TIẾP PHÍA DƯỚI
+    // =========================================================================
+    function addNewPage() {
+      pageCount++;
+      const container = document.getElementById('pagesContainer');
+      const firstPageStage = container.querySelector('.stage-wrapper');
+      
+      // Lấy tên sách & tác giả của trang 1 để đồng bộ sang trang mới
+      const leftHeader = firstPageStage.querySelector('.header-left')?.innerText || "Luật quản lý thuế";
+      const rightHeader = firstPageStage.querySelector('.header-right')?.innerText || "(c): Tên tác giả";
+      const quoteBookTitle = firstPageStage.querySelector('.quote-title')?.innerText || "TỰA ĐỀ TRUYỆN";
+      const quoteAuthor = firstPageStage.querySelector('.quote-sub')?.innerText || "Tác giả • Trích chương xx";
+
+      const newSandbox = document.createElement('div');
+      newSandbox.className = 'scale-sandbox';
+
+      newSandbox.innerHTML = `
+        <div class="stage-wrapper" onclick="setActivePage(this)">
+          <div class="page-control-bar">
+            <span>TRANG ${pageCount}</span>
+            <button class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
+          </div>
+
+          <span class="crop-mark crop-tl"></span>
+          <span class="crop-mark crop-tr"></span>
+          <span class="crop-mark crop-bl"></span>
+          <span class="crop-mark crop-br"></span>
+
+          <div class="book-wrapper">
+            <div class="page mode-${currentMode} ${currentFont}" spellcheck="false">
+              <div class="page-grain"></div>
+              <div class="page-vignette"></div>
+              
+              <div class="pageLayoutArea" style="height: 100%; display: ${currentMode === 'page' ? 'flex' : 'none'}; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div class="page-header">
+                    <div class="header-left" contenteditable="true">${leftHeader}</div>
+                    <div class="header-right" contenteditable="true">${rightHeader}</div>
+                  </div>
+                  
+                  <div class="page-body" contenteditable="true">
+                    <p>Nhập tiếp nội dung cho trang ${pageCount} vào đây...</p>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="footnotes" contenteditable="true"></div>
+                  <div class="page-number" contenteditable="true">${pageCount}</div>
+                </div>
+              </div>
+
+              <div class="quoteLayoutArea quote-container" style="display: ${currentMode === 'quote' ? 'flex' : 'none'};">
+                <div class="quote-mark">“</div>
+                
+                <div class="quote-content" contenteditable="true">
+                  Nhập trích dẫn quote tiếp theo vào đây...
+                </div>
+
+                <div class="quote-footer">
+                  <div class="quote-divider"></div>
+                  <div class="quote-title" contenteditable="true">${quoteBookTitle}</div>
+                  <div class="quote-sub" contenteditable="true">${quoteAuthor}</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(newSandbox);
+      setActivePage(newSandbox.querySelector('.stage-wrapper'));
+      
+      applyAllTextEffects();
+      setTimeout(autoFitMobile, 50);
+
+      // Cuộn êm xuống trang vừa tạo
+      newSandbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // XÓA MỘT TRANG BẤT KỲ
+    function deletePage(event, btnEl) {
+      event.stopPropagation();
+      const allSandboxes = document.querySelectorAll('.scale-sandbox');
+      if (allSandboxes.length <= 1) {
+        alert("Phải giữ lại ít nhất 1 trang chứ bà ơi!");
+        return;
+      }
+      if (!confirm("Bà có chắc muốn xóa trang này không?")) return;
+
+      const sandbox = btnEl.closest('.scale-sandbox');
+      sandbox.remove();
+      
+      // Chọn lại trang đầu tiên làm trang active
+      const remaining = document.querySelectorAll('.stage-wrapper');
+      if (remaining.length > 0) setActivePage(remaining[0]);
+      setTimeout(autoFitMobile, 50);
+    }
+
     function switchMode(mode) {
       currentMode = mode;
-      const page = document.getElementById('page');
-      const pageArea = document.getElementById('pageLayoutArea');
-      const quoteArea = document.getElementById('quoteLayoutArea');
+      const pages = document.querySelectorAll('.page');
       const fsInput = document.getElementById('fsInput');
       const spineBtn = document.getElementById('spineBtn');
 
-      if (mode === 'quote') {
-        page.classList.remove('mode-page');
-        page.classList.add('mode-quote');
-        pageArea.style.display = 'none';
-        quoteArea.style.display = 'flex';
-        
-        page.classList.remove('has-spine');
-        spineBtn.style.opacity = '0.35';
-        spineBtn.style.pointerEvents = 'none';
+      pages.forEach(page => {
+        const pageArea = page.querySelector('.pageLayoutArea');
+        const quoteArea = page.querySelector('.quoteLayoutArea');
 
-        if (parseFloat(fsInput.value) < 20) {
-          fsInput.value = 21.5;
-          updateStyle('--font-size', '21.5px');
+        if (mode === 'quote') {
+          page.classList.remove('mode-page');
+          page.classList.add('mode-quote');
+          pageArea.style.display = 'none';
+          quoteArea.style.display = 'flex';
+          page.classList.remove('has-spine');
+          spineBtn.style.opacity = '0.35';
+          spineBtn.style.pointerEvents = 'none';
+        } else {
+          page.classList.remove('mode-quote');
+          page.classList.add('mode-page');
+          quoteArea.style.display = 'none';
+          pageArea.style.display = 'flex';
+          spineBtn.style.opacity = '1';
+          spineBtn.style.pointerEvents = 'auto';
         }
-      } else {
-        page.classList.remove('mode-quote');
-        page.classList.add('mode-page');
-        quoteArea.style.display = 'none';
-        pageArea.style.display = 'flex';
-        
-        spineBtn.style.opacity = '1';
-        spineBtn.style.pointerEvents = 'auto';
+      });
 
-        if (parseFloat(fsInput.value) > 20) {
-          fsInput.value = 17.5;
-          updateStyle('--font-size', '17.5px');
-        }
+      if (mode === 'quote' && parseFloat(fsInput.value) < 20) {
+        fsInput.value = 21.5;
+        updateStyle('--font-size', '21.5px');
+      } else if (mode === 'page' && parseFloat(fsInput.value) > 20) {
+        fsInput.value = 17.5;
+        updateStyle('--font-size', '17.5px');
       }
+
       applyAllTextEffects();
       setTimeout(autoFitMobile, 50);
     }
 
     function toggleSpine() {
       if (currentMode === 'quote') return;
-      const page = document.getElementById('page');
-      page.classList.toggle('has-spine');
+      const pages = document.querySelectorAll('.page');
+      pages.forEach(p => p.classList.toggle('has-spine'));
       document.getElementById('spineBtn').classList.toggle('btn-active');
       autoSavePreset();
     }
@@ -881,7 +1025,6 @@
       const gVal = parseFloat(document.getElementById('glowSlider').value) || 0;
 
       const shadowLayers = [];
-
       if (sVal > 0) {
         const x = (sVal * 0.4).toFixed(1);
         const y = (sVal * 0.7).toFixed(1);
@@ -889,7 +1032,6 @@
         const alpha = Math.min(0.06 + sVal * 0.045, 0.28).toFixed(2);
         shadowLayers.push(`${x}px ${y}px ${blur}px rgba(0, 0, 0, ${alpha})`);
       }
-
       if (pVal > 0) {
         const lightA = Math.min(0.15 + pVal * 0.06, 0.45).toFixed(2);
         const darkA = Math.min(0.08 + pVal * 0.04, 0.25).toFixed(2);
@@ -898,7 +1040,6 @@
       }
 
       const filterLayers = [];
-
       if (bVal > 0) {
         filterLayers.push('url(#ink-bleed-filter)');
         document.getElementById('feDispPreview').setAttribute('scale', (bVal * 1.0).toFixed(1));
@@ -907,13 +1048,11 @@
         document.getElementById('feDispPreview').setAttribute('scale', '0');
         document.getElementById('feDispCanvas').setAttribute('scale', '0');
       }
-
       if (wVal > 0) {
         const contrast = (100 + wVal * 5).toFixed(0);
         filterLayers.push(`contrast(${contrast}%)`);
         filterLayers.push(`drop-shadow(0 0 ${(wVal * 0.2).toFixed(1)}px currentColor)`);
       }
-
       if (gVal > 0) {
         filterLayers.push(`drop-shadow(0 0 ${(gVal * 0.8).toFixed(1)}px currentColor)`);
       }
@@ -921,12 +1060,10 @@
       const finalShadow = shadowLayers.length > 0 ? shadowLayers.join(', ') : 'none';
       const finalFilter = filterLayers.length > 0 ? filterLayers.join(' ') : 'none';
 
-      const textNodes = document.querySelectorAll('#pageBody, #quoteText, .chapter-title, .chapter-num, .quote-title, .quote-sub');
+      const textNodes = document.querySelectorAll('.page-body, .quote-content, .chapter-title, .chapter-num, .quote-title, .quote-sub');
       textNodes.forEach(el => {
-        if (el) {
-          el.style.textShadow = finalShadow;
-          el.style.filter = finalFilter;
-        }
+        el.style.textShadow = finalShadow;
+        el.style.filter = finalFilter;
       });
 
       autoSavePreset();
@@ -945,9 +1082,11 @@
     }
 
     function changeFont(fontClass) {
-      const page = document.getElementById('page');
-      page.classList.remove(currentFont);
-      page.classList.add(fontClass);
+      const pages = document.querySelectorAll('.page');
+      pages.forEach(p => {
+        p.classList.remove(currentFont);
+        p.classList.add(fontClass);
+      });
       currentFont = fontClass;
       autoSavePreset();
     }
@@ -995,9 +1134,7 @@
       const directTarget = container.closest('.hl-yellow, .hl-gray, .pencil-underline');
       if (directTarget) {
         const parent = directTarget.parentNode;
-        while (directTarget.firstChild) {
-          parent.insertBefore(directTarget.firstChild, directTarget);
-        }
+        while (directTarget.firstChild) parent.insertBefore(directTarget.firstChild, directTarget);
         parent.removeChild(directTarget);
         autoSavePreset();
         return;
@@ -1027,8 +1164,15 @@
       autoSavePreset();
     }
 
-    function getPresetData() {
-      return {
+    function autoSavePreset() {
+      const pagesData = [];
+      document.querySelectorAll('.stage-wrapper').forEach(sw => {
+        pagesData.push({
+          html: sw.querySelector('.book-wrapper').innerHTML
+        });
+      });
+
+      const data = {
         font: currentFont,
         bg: document.getElementById('bgPicker').value,
         text: document.getElementById('textPicker').value,
@@ -1041,23 +1185,18 @@
         wet: document.getElementById('wetSlider').value,
         press: document.getElementById('pressSlider').value,
         glow: document.getElementById('glowSlider').value,
-        headerLeft: document.getElementById('headerLeft').innerText,
-        headerRight: document.getElementById('headerRight').innerText,
-        spine: document.getElementById('page').classList.contains('has-spine')
+        pages: pagesData
       };
-    }
-
-    function autoSavePreset() {
-      localStorage.setItem('book_preset_settings', JSON.stringify(getPresetData()));
+      localStorage.setItem('book_multipage_preset', JSON.stringify(data));
     }
 
     function savePresetManual() {
       autoSavePreset();
-      alert("✅ Đã lưu toàn bộ thiết lập!");
+      alert("✅ Đã lưu toàn bộ các trang và định dạng!");
     }
 
     function loadSavedPreset() {
-      const saved = localStorage.getItem('book_preset_settings');
+      const saved = localStorage.getItem('book_multipage_preset');
       if (!saved) return;
       try {
         const data = JSON.parse(saved);
@@ -1083,113 +1222,98 @@
           document.getElementById('tiInput').value = data.textIndent;
           updateStyle('--text-indent', data.textIndent + 'em');
         }
-        
         if (data.bleed !== undefined) document.getElementById('bleedSlider').value = data.bleed;
         if (data.shadow !== undefined) document.getElementById('shadowSlider').value = data.shadow;
         if (data.wet !== undefined) document.getElementById('wetSlider').value = data.wet;
         if (data.press !== undefined) document.getElementById('pressSlider').value = data.press;
         if (data.glow !== undefined) document.getElementById('glowSlider').value = data.glow;
 
-        if (data.headerLeft) document.getElementById('headerLeft').innerText = data.headerLeft;
-        if (data.headerRight) document.getElementById('headerRight').innerText = data.headerRight;
+        // Phục hồi lại toàn bộ danh sách các trang đã lưu
+        if (data.pages && data.pages.length > 0) {
+          const container = document.getElementById('pagesContainer');
+          container.innerHTML = '';
+          pageCount = 0;
 
-        if (data.spine && currentMode === 'page') {
-          document.getElementById('page').classList.add('has-spine');
-          document.getElementById('spineBtn').classList.add('btn-active');
-        } else {
-          document.getElementById('page').classList.remove('has-spine');
-          document.getElementById('spineBtn').classList.remove('btn-active');
+          data.pages.forEach((pData, idx) => {
+            pageCount++;
+            const sb = document.createElement('div');
+            sb.className = 'scale-sandbox';
+            sb.innerHTML = `
+              <div class="stage-wrapper ${idx === 0 ? 'active-page' : ''}" onclick="setActivePage(this)">
+                <div class="page-control-bar">
+                  <span>TRANG ${pageCount}</span>
+                  <button class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
+                </div>
+                <span class="crop-mark crop-tl"></span>
+                <span class="crop-mark crop-tr"></span>
+                <span class="crop-mark crop-bl"></span>
+                <span class="crop-mark crop-br"></span>
+                <div class="book-wrapper">
+                  ${pData.html}
+                </div>
+              </div>
+            `;
+            container.appendChild(sb);
+          });
         }
-
         applyAllTextEffects();
       } catch (e) {}
     }
 
-    function nextPage() {
-      if (!confirm("Bà có muốn sang trang mới không? (Định dạng giữ nguyên, số trang tự tăng).")) return;
-      const pageNumEl = document.getElementById('pageNumber');
-      let currentNum = parseInt(pageNumEl.innerText.trim(), 10);
-      pageNumEl.innerText = isNaN(currentNum) ? 2 : (currentNum + 1);
-      document.getElementById('chapterHeader').style.display = 'none';
-      document.getElementById('pageBody').innerHTML = '<p>Bắt đầu nhập nội dung trang mới vào đây...</p>';
-      document.getElementById('pageFootnotes').innerHTML = '';
-      nextFootnoteNumber = 1;
-    }
-
-    function formatDoc(cmd) {
-      document.execCommand(cmd, false, null);
-    }
-
-    function insertSceneBreak() {
-      const html = '<p class="scene-break">* * *</p><p><br></p>';
-      document.execCommand('insertHTML', false, html);
-    }
+    function formatDoc(cmd) { document.execCommand(cmd, false, null); }
+    function insertSceneBreak() { document.execCommand('insertHTML', false, '<p class="scene-break">* * *</p><p><br></p>'); }
 
     function toSuperscript(str) {
-      const map = {
-        '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
-        '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹'
-      };
+      const map = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹' };
       return String(str).split('').map(ch => map[ch] || ch).join('');
     }
 
     function insertFootnoteMark() {
-      const input = prompt("Nhập số chú thích (bấm số thường 1, 2, 3...):", nextFootnoteNumber);
+      const input = prompt("Nhập số chú thích:", nextFootnoteNumber);
       if (input === null || input.trim() === "") return;
-
-      const num = input.trim();
-      const supText = toSuperscript(num);
+      const supText = toSuperscript(input.trim());
       document.execCommand("insertText", false, supText);
 
-      const footnotesBox = document.getElementById('pageFootnotes');
-      const newFootnoteLine = document.createElement('div');
-      newFootnoteLine.innerText = `${supText} "Nhập nội dung giải nghĩa..."`;
-      footnotesBox.appendChild(newFootnoteLine);
-
-      const parsed = parseInt(num, 10);
+      // Thêm vào đúng phần chú thích của trang đang active
+      const activeStage = document.querySelector('.stage-wrapper.active-page') || document.querySelector('.stage-wrapper');
+      const footnotesBox = activeStage.querySelector('.footnotes');
+      if (footnotesBox) {
+        const newLine = document.createElement('div');
+        newLine.innerText = `${supText} "Nhập nội dung giải nghĩa..."`;
+        footnotesBox.appendChild(newLine);
+      }
+      const parsed = parseInt(input.trim(), 10);
       if (!isNaN(parsed)) nextFootnoteNumber = parsed + 1;
     }
 
     function applyDropCap() {
       const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) {
-        alert("Bà bôi đen 1 chữ cái đầu dòng rồi ấn nút nhé!");
-        return;
-      }
+      if (!selection.rangeCount || selection.isCollapsed) return;
       const range = selection.getRangeAt(0);
       const span = document.createElement("span");
       span.className = "dropcap";
       span.appendChild(range.extractContents());
       range.insertNode(span);
-
       let parentP = span.closest('p');
       if (parentP) parentP.classList.add('has-dropcap');
     }
 
-    async function exportImage() {
-      const sandbox = document.getElementById('scaleSandbox');
-      const page = document.getElementById('page');
-      const bookWrapper = document.getElementById('bookWrapper');
-      const exportBtn = document.querySelector('button.primary');
-      
-      const originalBtnText = exportBtn.innerText;
-      exportBtn.innerText = "⏳ Đang kết xuất 4K...";
-      exportBtn.disabled = true;
-
-      const prevSandboxTransform = sandbox.style.transform;
-      const prevSandboxMargin = sandbox.style.marginBottom;
+    // =========================================================================
+    // LÕI KẾT XUẤT 1 TRANG SÁCH THÀNH ẢNH 4K SẮC NÉT
+    // =========================================================================
+    async function renderPageToCanvas(pageEl) {
+      const sandbox = pageEl.closest('.scale-sandbox');
+      const prevTransform = sandbox.style.transform;
+      const prevMargin = sandbox.style.marginBottom;
       
       sandbox.style.transform = 'none';
       sandbox.style.marginBottom = '0px';
 
-      const hadSpine = page.classList.contains('has-spine');
-      page.classList.remove('has-spine');
+      const hadSpine = pageEl.classList.contains('has-spine');
+      pageEl.classList.remove('has-spine');
 
-      const origWrapperBoxShadow = bookWrapper.style.boxShadow;
-      bookWrapper.style.boxShadow = 'none';
-
-      const pageRect = page.getBoundingClientRect();
-      const highlightSpans = page.querySelectorAll('.hl-yellow, .hl-gray');
+      const pageRect = pageEl.getBoundingClientRect();
+      const highlightSpans = pageEl.querySelectorAll('.hl-yellow, .hl-gray');
       const tempBgElements = [];
       const modifiedSpans = [];
 
@@ -1200,16 +1324,12 @@
         const bgColor = window.getComputedStyle(span).backgroundColor;
 
         if (rects.length > 0) {
-          modifiedSpans.push({
-            span: span,
-            origBg: span.style.backgroundColor
-          });
+          modifiedSpans.push({ span: span, origBg: span.style.backgroundColor });
           span.style.backgroundColor = 'transparent';
 
           for (let i = 0; i < rects.length; i++) {
             const r = rects[i];
             if (r.width <= 0 || r.height <= 0) continue;
-
             const bgDiv = document.createElement('div');
             bgDiv.className = 'temp-hl-bg';
             bgDiv.style.left = (r.left - pageRect.left - 2) + 'px';
@@ -1217,81 +1337,62 @@
             bgDiv.style.width = (r.width + 4) + 'px';
             bgDiv.style.height = (r.height + 2) + 'px';
             bgDiv.style.backgroundColor = bgColor;
-
-            page.appendChild(bgDiv);
+            pageEl.appendChild(bgDiv);
             tempBgElements.push(bgDiv);
           }
         }
       });
 
-      page.style.textRendering = 'optimizeLegibility';
-      page.style.webkitFontSmoothing = 'antialiased';
+      pageEl.style.textRendering = 'optimizeLegibility';
+      pageEl.style.webkitFontSmoothing = 'antialiased';
 
-      const targetScale = 4.0;
+      const canvas = await html2canvas(pageEl, {
+        scale: 4.0,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null,
+        logging: false
+      });
 
-      try {
-        const canvas = await html2canvas(page, {
-          scale: targetScale,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: null,
-          logging: false
-        });
+      tempBgElements.forEach(el => el.remove());
+      modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
+      sandbox.style.transform = prevTransform;
+      sandbox.style.marginBottom = prevMargin;
+      if (hadSpine && currentMode === 'page') pageEl.classList.add('has-spine');
 
-        tempBgElements.forEach(el => el.remove());
-        modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
-        
-        sandbox.style.transform = prevSandboxTransform;
-        sandbox.style.marginBottom = prevSandboxMargin;
-        bookWrapper.style.boxShadow = origWrapperBoxShadow;
-        
-        if (hadSpine && currentMode === 'page') {
-          page.classList.add('has-spine');
-        }
+      let finalCanvas = canvas;
+      const bVal = parseFloat(document.getElementById('bleedSlider').value) || 0;
+      if (bVal > 0) {
+        try {
+          const bleedCanvas = document.createElement('canvas');
+          bleedCanvas.width = canvas.width;
+          bleedCanvas.height = canvas.height;
+          const bCtx = bleedCanvas.getContext('2d');
+          bCtx.filter = 'url(#ink-bleed-filter-4k)';
+          bCtx.drawImage(canvas, 0, 0);
+          finalCanvas = bleedCanvas;
+        } catch (e) { finalCanvas = canvas; }
+      }
+      return finalCanvas;
+    }
 
-        let finalCanvas = canvas;
-        const bVal = parseFloat(document.getElementById('bleedSlider').value) || 0;
-
-        if (bVal > 0) {
-          try {
-            const bleedCanvas = document.createElement('canvas');
-            bleedCanvas.width = canvas.width;
-            bleedCanvas.height = canvas.height;
-            const bCtx = bleedCanvas.getContext('2d');
-
-            bCtx.filter = 'url(#ink-bleed-filter-4k)';
-            bCtx.drawImage(canvas, 0, 0);
-
-            if (bCtx.filter === 'none' || !bCtx.filter) {
-              bCtx.clearRect(0, 0, canvas.width, canvas.height);
-              bCtx.filter = 'contrast(120%) blur(0.8px)';
-              bCtx.drawImage(canvas, 0, 0);
-            }
-            finalCanvas = bleedCanvas;
-          } catch (e) {
-            finalCanvas = canvas;
-          }
-        }
-
-        const fileName = (currentMode === 'quote' ? 'quote-wattpad-4K-' : 'trang-sach-4K-') + Date.now() + '.png';
-
-        finalCanvas.toBlob(async (blob) => {
+    // TẢI FILE CANVAS VỀ MÁY HOẶC MỞ MENU SHARE
+    function downloadCanvas(canvas, fileName) {
+      return new Promise((resolve) => {
+        canvas.toBlob(async (blob) => {
           if (!blob) {
-            fallbackDownload(finalCanvas.toDataURL('image/png'), fileName);
+            fallbackDownload(canvas.toDataURL('image/png'), fileName);
+            resolve();
             return;
           }
 
           const file = new File([blob], fileName, { type: 'image/png' });
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             try {
-              await navigator.share({
-                files: [file],
-                title: 'Trang sách / Quote 4K'
-              });
-              exportBtn.innerText = originalBtnText;
-              exportBtn.disabled = false;
+              await navigator.share({ files: [file], title: fileName });
+              resolve();
               return;
-            } catch (shareErr) {}
+            } catch (err) {}
           }
 
           const blobUrl = URL.createObjectURL(blob);
@@ -1301,42 +1402,71 @@
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
-
-          exportBtn.innerText = originalBtnText;
-          exportBtn.disabled = false;
+          setTimeout(() => { URL.revokeObjectURL(blobUrl); resolve(); }, 1200);
         }, 'image/png');
+      });
+    }
 
+    // 1. TẢI ĐÚNG TRANG ĐANG CHỌN (ACTIVE PAGE)
+    async function exportActivePage() {
+      const activeStage = document.querySelector('.stage-wrapper.active-page') || document.querySelector('.stage-wrapper');
+      if (!activeStage) return;
+
+      const pageEl = activeStage.querySelector('.page');
+      const pageNumText = activeStage.querySelector('.page-control-bar span')?.innerText.replace(/\s+/g, '_') || 'trang';
+      const btn = document.querySelector('button.primary');
+      const oldText = btn.innerText;
+      btn.innerText = "⏳ Đang kết xuất 4K...";
+      btn.disabled = true;
+
+      try {
+        const canvas = await renderPageToCanvas(pageEl);
+        const fileName = `${currentMode === 'quote' ? 'quote' : 'sach'}_${pageNumText}_4K_${Date.now()}.png`;
+        await downloadCanvas(canvas, fileName);
       } catch (err) {
-        tempBgElements.forEach(el => el.remove());
-        modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
-        sandbox.style.transform = prevSandboxTransform;
-        sandbox.style.marginBottom = prevSandboxMargin;
-        bookWrapper.style.boxShadow = origWrapperBoxShadow;
-        if (hadSpine && currentMode === 'page') page.classList.add('has-spine');
-        exportBtn.innerText = originalBtnText;
-        exportBtn.disabled = false;
         console.error(err);
-        alert("Điện thoại báo bộ nhớ đang đầy, bà thử bấm lại lần nữa nha!");
+        alert("Lỗi khi tạo ảnh, bà thử lại nha!");
+      } finally {
+        btn.innerText = oldText;
+        btn.disabled = false;
+      }
+    }
+
+    // 2. TẢI TẤT CẢ CÁC TRANG CÙNG LÚC
+    async function exportAllPages() {
+      const stages = document.querySelectorAll('.stage-wrapper');
+      if (stages.length === 0) return;
+
+      const btn = document.querySelector('button[onclick="exportAllPages()"]');
+      const oldText = btn.innerText;
+      btn.disabled = true;
+
+      try {
+        for (let i = 0; i < stages.length; i++) {
+          btn.innerText = `⏳ Đang tải trang ${i + 1}/${stages.length}...`;
+          const pageEl = stages[i].querySelector('.page');
+          const pageNum = i + 1;
+          const canvas = await renderPageToCanvas(pageEl);
+          const fileName = `${currentMode === 'quote' ? 'quote' : 'sach'}_Trang_${pageNum}_4K_${Date.now()}.png`;
+          await downloadCanvas(canvas, fileName);
+          // Nghỉ 800ms giữa các trang để máy kịp giải phóng bộ nhớ RAM
+          await new Promise(r => setTimeout(r, 800));
+        }
+        alert(`✅ Đã tải xuống toàn bộ ${stages.length} trang thành công!`);
+      } catch (err) {
+        console.error(err);
+        alert("Có lỗi trong quá trình tải hàng loạt, bà thử lại nha!");
+      } finally {
+        btn.innerText = oldText;
+        btn.disabled = false;
       }
     }
 
     function fallbackDownload(dataUrl, fileName) {
-      const img = new Image();
-      img.src = dataUrl;
-      const w = window.open("");
-      if (w) {
-        w.document.write("<p style='text-align:center;font-family:sans-serif;'>Chạm giữ vào ảnh bên dưới rồi chọn <b>Lưu hình ảnh</b> nhé:</p>");
-        w.document.write(img.outerHTML);
-      } else {
-        const link = document.createElement('a');
-        link.download = fileName;
-        link.href = dataUrl;
-        link.click();
-      }
-      const exportBtn = document.querySelector('button.primary');
-      exportBtn.innerText = "📸 Tải PNG (4K)";
-      exportBtn.disabled = false;
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = dataUrl;
+      link.click();
     }
   </script>
 </body>
