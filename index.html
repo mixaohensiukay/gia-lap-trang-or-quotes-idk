@@ -233,7 +233,6 @@
       background-color: var(--custom-bg);
       color: var(--custom-text);
       position: relative;
-      box-shadow: inset 0 0 60px rgba(0,0,0,0.04), 0 2px 12px rgba(0,0,0,0.18);
       transition: background-color 0.2s ease, width 0.3s ease, height 0.3s ease;
       overflow: hidden;
     }
@@ -251,13 +250,13 @@
     .page-vignette {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.25) 100%);
+      background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.15) 100%);
       opacity: var(--vignette-opacity);
       pointer-events: none;
       z-index: 1;
     }
 
-    /* CHỈ ÁP DỤNG BÓNG GÁY 3D TRÊN KHỔ TRANG SÁCH DÀI, CẤM TUYỆT ĐỐI TRÊN KHỔ QUOTE VUÔNG */
+    /* CHỈ HIỆN GÁY SÁCH KHI Ở KHỔ TRANG DÀI */
     .page.mode-page.has-spine::after {
       content: "";
       position: absolute;
@@ -268,8 +267,11 @@
       z-index: 5;
     }
 
-    /* KHỔ QUOTE VUÔNG THÌ ẨN TRIỆT ĐỂ BÓNG GÁY */
+    /* QUOTE VUÔNG: CẤM TUYỆT ĐỐI GÁY SÁCH & TỐI VIỀN */
     .page.mode-quote::after {
+      display: none !important;
+    }
+    .page.mode-quote .page-vignette {
       display: none !important;
     }
 
@@ -522,7 +524,7 @@
         <button onmousedown="event.preventDefault()" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold; background: #3b3a4a;">⇥ Tab</button>
       </div>
 
-      <!-- BỘ ĐIỀU KHIỂN CỠ CHỮ & GIÃN DÒNG BẰNG STEPPER BẤM SỐ -->
+      <!-- Cỡ chữ & Giãn dòng -->
       <div class="toolbar-group">
         <div class="num-stepper" title="Cỡ chữ">
           <span class="stepper-label">Cỡ</span>
@@ -553,7 +555,7 @@
         </div>
       </div>
 
-      <!-- BỘ ĐIỀU KHIỂN HIỆU ỨNG BẰNG STEPPER BẤM SỐ -->
+      <!-- Hiệu ứng chữ -->
       <div class="toolbar-group">
         <div class="num-stepper" title="Mực lem xơ giấy">
           <span class="stepper-label">Lem</span>
@@ -593,7 +595,7 @@
 
       <!-- Giấy & Màu sắc -->
       <div class="toolbar-group">
-        <label title="Tối viền">Viền:<input type="range" min="0" max="0.3" step="0.02" value="0.08" oninput="updateStyle('--vignette-opacity', this.value)"></label>
+        <label title="Tối viền">Viền:<input type="range" min="0" max="0.3" step="0.02" value="0" oninput="updateStyle('--vignette-opacity', this.value)"></label>
         <label title="Hạt giấy">Hạt:<input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)">
         <label title="Đổi màu nền">Nền:<input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)"></label>
         <label title="Đổi màu chữ">Chữ:<input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)"></label>
@@ -772,12 +774,19 @@
       const pageArea = document.getElementById('pageLayoutArea');
       const quoteArea = document.getElementById('quoteLayoutArea');
       const fsInput = document.getElementById('fsInput');
+      const spineBtn = document.getElementById('spineBtn');
 
       if (mode === 'quote') {
         page.classList.remove('mode-page');
         page.classList.add('mode-quote');
         pageArea.style.display = 'none';
         quoteArea.style.display = 'flex';
+        
+        // Khóa gáy sách khi ở chế độ Quote
+        page.classList.remove('has-spine');
+        spineBtn.style.opacity = '0.35';
+        spineBtn.style.pointerEvents = 'none';
+
         if (parseFloat(fsInput.value) < 20) {
           fsInput.value = 21.5;
           updateStyle('--font-size', '21.5px');
@@ -787,6 +796,11 @@
         page.classList.add('mode-page');
         quoteArea.style.display = 'none';
         pageArea.style.display = 'flex';
+        
+        // Mở lại quyền dùng gáy sách ở khổ trang dài
+        spineBtn.style.opacity = '1';
+        spineBtn.style.pointerEvents = 'auto';
+
         if (parseFloat(fsInput.value) > 20) {
           fsInput.value = 17.5;
           updateStyle('--font-size', '17.5px');
@@ -797,6 +811,7 @@
     }
 
     function toggleSpine() {
+      if (currentMode === 'quote') return; // Cấm bật gáy sách ở Quote vuông
       const page = document.getElementById('page');
       page.classList.toggle('has-spine');
       document.getElementById('spineBtn').classList.toggle('btn-active');
@@ -978,7 +993,7 @@
         if (data.headerLeft) document.getElementById('headerLeft').innerText = data.headerLeft;
         if (data.headerRight) document.getElementById('headerRight').innerText = data.headerRight;
 
-        if (data.spine) {
+        if (data.spine && currentMode === 'page') {
           document.getElementById('page').classList.add('has-spine');
           document.getElementById('spineBtn').classList.add('btn-active');
         } else {
@@ -1052,11 +1067,13 @@
     }
 
     // =========================================================================
-    // XUẤT ẢNH HOÀN HẢO: ĐÃ LOẠI TRỪ 100% VỆT XÁM GÁY SÁCH KHI Ở KHỔ QUOTE
+    // HÀM XUẤT ẢNH: ĐÃ DỌN DẸP 100% TẤT CẢ CÁC LOẠI BÓNG ĐÈ MÉP TRÁI
     // =========================================================================
     async function exportImage() {
       const sandbox = document.getElementById('scaleSandbox');
+      const stage = document.getElementById('stageWrapper');
       const page = document.getElementById('page');
+      const bookWrapper = document.getElementById('bookWrapper');
       const exportBtn = document.querySelector('button.primary');
       
       const originalBtnText = exportBtn.innerText;
@@ -1066,14 +1083,16 @@
       const prevSandboxTransform = sandbox.style.transform;
       const prevSandboxMargin = sandbox.style.marginBottom;
       
+      // Đưa scale về 1:1 chuẩn xác
       sandbox.style.transform = 'none';
       sandbox.style.marginBottom = '0px';
 
-      // NẾU LÀ KHỔ QUOTE VUÔNG: TẠM THỜI TẮT BỎ HẲN LỚP GÁY SÁCH KHI CHỤP
+      // 1. TẠM ẨN BÓNG VIỀN & GÁY SÁCH ĐỂ KHÔNG BỊ LEM MÀU ĐEN VÀO ẢNH
       const hadSpine = page.classList.contains('has-spine');
-      if (currentMode === 'quote' && hadSpine) {
-        page.classList.remove('has-spine');
-      }
+      page.classList.remove('has-spine');
+
+      const origWrapperBoxShadow = bookWrapper.style.boxShadow;
+      bookWrapper.style.boxShadow = 'none'; // Tắt bóng đen bao ngoài
 
       const pageRect = page.getBoundingClientRect();
       const highlightSpans = page.querySelectorAll('.hl-yellow, .hl-gray');
@@ -1118,6 +1137,7 @@
       const renderScale = isMobile ? 2.2 : 3.5; 
 
       try {
+        // CHỤP TRỰC TIẾP KHUNG PAGE (KHÔNG CHỤP KHUNG BÓNG NGOÀI)
         const canvas = await html2canvas(page, {
           scale: renderScale,
           useCORS: true,
@@ -1126,14 +1146,15 @@
           logging: false
         });
 
+        // Khôi phục lại trạng thái ban đầu
         tempBgElements.forEach(el => el.remove());
         modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
         
         sandbox.style.transform = prevSandboxTransform;
         sandbox.style.marginBottom = prevSandboxMargin;
-
-        // Trả lại trạng thái gáy sách sau khi chụp xong
-        if (currentMode === 'quote' && hadSpine) {
+        bookWrapper.style.boxShadow = origWrapperBoxShadow;
+        
+        if (hadSpine && currentMode === 'page') {
           page.classList.add('has-spine');
         }
 
@@ -1200,7 +1221,8 @@
         modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
         sandbox.style.transform = prevSandboxTransform;
         sandbox.style.marginBottom = prevSandboxMargin;
-        if (currentMode === 'quote' && hadSpine) page.classList.add('has-spine');
+        bookWrapper.style.boxShadow = origWrapperBoxShadow;
+        if (hadSpine && currentMode === 'page') page.classList.add('has-spine');
         exportBtn.innerText = originalBtnText;
         exportBtn.disabled = false;
         console.error(err);
