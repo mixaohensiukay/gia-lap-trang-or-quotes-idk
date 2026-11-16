@@ -1,5 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
-  <path d="M6 6h10"/>
-  <path d="M6 10h10"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <!-- Nền dốc nhẹ màu xanh mây trời pastel -->
+    <linearGradient id="pastelBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0ecff" />
+      <stop offset="100%" stop-color="#b9d5fd" />
+    </linearGradient>
+  </defs>
+
+  <!-- Khung bo tròn kiểu App Icon -->
+  <rect width="64" height="64" rx="16" fill="url(#pastelBlue)" />
+  <!-- Viền kính mờ tinh tế -->
+  <rect x="1" y="1" width="62" height="62" rx="15" fill="none" stroke="#93c5fd" stroke-width="2" />
+
+  <!-- Dấu ngoặc kép giọt nước đôi màu xanh mực sang trọng (#2563eb) -->
+  <g fill="#2563eb">
+    <path d="M 23 20 C 28.5 20 33 24.5 33 30 C 33 35.5 29.5 40 25 42 C 24 45.5 20.5 49 15 52 L 13.5 50 C 18 45.5 19.5 42.5 20 39.5 C 15 39 12 35 12 30 C 12 24.5 17 20 23 20 Z" />
+    <path d="M 45 20 C 50.5 20 55 24.5 55 30 C 55 35.5 51.5 40 47 42 C 46 45.5 42.5 49 37 52 L 35.5 50 C 40 45.5 41.5 42.5 42 39.5 C 37 39 34 35 34 30 C 34 24.5 39 20 45 20 Z" />
+  </g>
 </svg>
