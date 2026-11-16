@@ -18,7 +18,11 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400..800&family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Cinzel:wght@500;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..800;1,400..800&family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;1,400&family=Cinzel:wght@500;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+  <!-- NẠP BẢN STIX TWO TEXT TIẾNG VIỆT ĐỘC LẬP CHUẨN IOS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/stix-two-text@5.0.18/vietnamese.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/stix-two-text@5.0.18/index.css">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -386,14 +390,15 @@
       aspect-ratio: 1 / 1;
     }
 
-    .font-alegreya { font-family: 'Alegreya', serif; }
-    .font-stix { font-family: 'STIX Two Text', serif; }
-    .font-garamond { font-family: 'EB Garamond', serif; }
-    .font-lora { font-family: 'Lora', serif; }
-    .font-literata { font-family: 'Literata', serif; }
-    .font-courier { font-family: 'Courier Prime', monospace; }
-    .font-vietnam { font-family: 'Be Vietnam Pro', sans-serif; }
-    .font-helvetica { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    /* ĐÃ NÂNG CẤP CHUỖI FONT STIX TWO TEXT VÀ FALLBACKS CHUẨN IOS */
+    .font-alegreya { font-family: 'Alegreya', Georgia, serif; }
+    .font-stix { font-family: 'STIX Two Text', 'STIX Two Math', Georgia, serif; }
+    .font-garamond { font-family: 'EB Garamond', Georgia, serif; }
+    .font-lora { font-family: 'Lora', Georgia, serif; }
+    .font-literata { font-family: 'Literata', Georgia, serif; }
+    .font-courier { font-family: 'Courier Prime', Courier, monospace; }
+    .font-vietnam { font-family: 'Be Vietnam Pro', -apple-system, sans-serif; }
+    .font-helvetica { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 
     .page-header {
       display: flex;
@@ -603,7 +608,6 @@
 
       <!-- Nhóm 2: Skin giao diện, Dự án, Undo/Redo & Thêm trang mới -->
       <div class="toolbar-group">
-        <!-- CẶP NÚT UNDO / REDO (HOÀN TÁC / LÀM LẠI) TIỆN DỤNG -->
         <button class="prevent-lose-focus" onclick="execUndo()" title="Hoàn tác thao tác trước (Ctrl + Z)" style="font-size:15px;font-weight:bold;padding:6px 11px;">↩</button>
         <button class="prevent-lose-focus" onclick="execRedo()" title="Làm lại thao tác sau (Ctrl + Y)" style="font-size:15px;font-weight:bold;padding:6px 11px;">↪</button>
         
@@ -801,9 +805,6 @@
     let pageCount = 1;
     let currentSkin = 'pastel';
 
-    // =========================================================================
-    // TÍNH NĂNG HOÀN TÁC (UNDO) VÀ LÀM LẠI (REDO)
-    // =========================================================================
     function execUndo() {
       document.execCommand('undo', false, null);
     }
@@ -812,7 +813,6 @@
       document.execCommand('redo', false, null);
     }
 
-    // BẮT PHÍM TẮT BÀN PHÍM CHUẨN: CTRL + Z VÀ CTRL + Y (HOẶC CTRL + SHIFT + Z)
     document.addEventListener('keydown', function(e) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
         if (e.shiftKey) {
@@ -828,7 +828,6 @@
       }
     });
 
-    // CHUYỂN SKIN GIAO DIỆN
     function toggleThemeSkin() {
       const body = document.body;
       const btn = document.getElementById('themeSkinBtn');
@@ -844,7 +843,6 @@
       autoSavePreset();
     }
 
-    // CON LĂN CHUỘT TRƯỢT NGANG TRÊN PC
     const toolbarEl = document.getElementById('mainToolbar');
     if (toolbarEl) {
       toolbarEl.addEventListener('wheel', (e) => {
@@ -855,7 +853,6 @@
       }, { passive: false });
     }
 
-    // CHỐNG MẤT VÙNG CHỌN TRÊN MOBILE
     document.querySelectorAll('.prevent-lose-focus').forEach(btn => {
       btn.addEventListener('pointerdown', e => e.preventDefault());
       btn.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
