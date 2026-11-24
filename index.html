@@ -145,13 +145,15 @@
       font-size: 13px;
       cursor: pointer;
       outline: none;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       flex-shrink: 0;
+      touch-action: manipulation; /* Tăng tốc độ phản hồi cảm ứng trên điện thoại */
     }
 
-    .toolbar button:hover {
-      background: var(--ui-card-hover);
-      transform: translateY(-1px);
+    .toolbar button:active {
+      background: var(--ui-accent) !important;
+      color: #fff !important;
+      transform: scale(0.95);
     }
 
     .toolbar input[type="color"] {
@@ -185,20 +187,23 @@
       background: transparent;
       border: none;
       color: var(--ui-text-main);
-      width: 22px;
+      width: 26px;
       height: 100%;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: bold;
       padding: 0;
       border-radius: 0;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
-    .num-stepper button:hover { background: var(--ui-card-hover); }
-    .num-stepper button:active { background: var(--ui-accent); color: #fff; }
+    .num-stepper button:active {
+      background: var(--ui-accent) !important;
+      color: #fff !important;
+    }
 
     .num-stepper input[type="number"] {
       width: 38px;
@@ -228,7 +233,6 @@
       padding: 6px 14px;
       box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
     }
-    .toolbar button.primary:hover { background: var(--ui-accent-hover); }
 
     .btn-active {
       background: var(--ui-accent) !important;
@@ -251,7 +255,7 @@
 
     .btn-icon {
       font-size: 13px;
-      padding: 6px 9px !important;
+      padding: 6px 10px !important;
     }
 
     .viewport {
@@ -390,7 +394,6 @@
       aspect-ratio: 1 / 1;
     }
 
-    /* ĐÃ NÂNG CẤP CHUỖI FONT STIX TWO TEXT VÀ FALLBACKS CHUẨN IOS */
     .font-alegreya { font-family: 'Alegreya', Georgia, serif; }
     .font-stix { font-family: 'STIX Two Text', 'STIX Two Math', Georgia, serif; }
     .font-garamond { font-family: 'EB Garamond', Georgia, serif; }
@@ -602,50 +605,50 @@
           <option value="page">📄 Khổ trang dài</option>
           <option value="quote">🔲 Quote vuông 1:1</option>
         </select>
-        <button class="primary" onclick="exportActivePage()">📸 Tải trang đang chọn</button>
-        <button class="primary" style="background:#10b981;border-color:#059669;" onclick="exportAllPages()">📦 Tải TẤT CẢ trang</button>
+        <button class="primary" onclick="exportActivePage()">📸 Tải trang chọn</button>
+        <button class="primary" style="background:#10b981;border-color:#059669;" onclick="exportAllPages()">📦 Tải TẤT CẢ</button>
       </div>
 
       <!-- Nhóm 2: Skin giao diện, Dự án, Undo/Redo & Thêm trang mới -->
       <div class="toolbar-group">
-        <button class="prevent-lose-focus" onclick="execUndo()" title="Hoàn tác thao tác trước (Ctrl + Z)" style="font-size:15px;font-weight:bold;padding:6px 11px;">↩</button>
-        <button class="prevent-lose-focus" onclick="execRedo()" title="Làm lại thao tác sau (Ctrl + Y)" style="font-size:15px;font-weight:bold;padding:6px 11px;">↪</button>
+        <button onclick="execUndo()" title="Hoàn tác thao tác trước (Ctrl + Z)" style="font-size:15px;font-weight:bold;padding:6px 11px;">↩</button>
+        <button onclick="execRedo()" title="Làm lại thao tác sau (Ctrl + Y)" style="font-size:15px;font-weight:bold;padding:6px 11px;">↪</button>
         
         <button onclick="toggleThemeSkin()" id="themeSkinBtn" title="Đổi giao diện Pastel Xanh / Dark Studio" style="font-weight: 600;">🎨 Skin Xanh</button>
         <button onclick="savePresetManual()" title="Lưu lại toàn bộ định dạng">💾 Lưu</button>
         <button onclick="addNewPage()" title="Thêm một trang mới nằm tiếp theo phía dưới" style="font-weight:bold;color:var(--ui-accent);">➕ Thêm Trang</button>
         <button id="spineBtn" onclick="toggleSpine()" title="Bật/Tắt bóng gáy sách 3D (Chỉ áp dụng trang dài)">📖 Gáy 3D</button>
-        <button class="prevent-lose-focus" onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold;">⇥ Tab</button>
+        <button onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold;">⇥ Tab</button>
       </div>
 
-      <!-- Nhóm 3: Cỡ chữ & Giãn dòng -->
+      <!-- Nhóm 3: Cỡ chữ & Giãn dòng (ĐÃ MỞ KHÓA CẢM ỨNG 100%) -->
       <div class="toolbar-group">
         <div class="num-stepper" title="Cỡ chữ">
           <span class="stepper-label">Cỡ</span>
-          <button class="prevent-lose-focus" onclick="adjustStepper('fsInput', -0.5)">-</button>
+          <button type="button" onclick="adjustStepper('fsInput', -0.5)">-</button>
           <input type="number" id="fsInput" value="17.5" step="0.5" min="12" max="36" oninput="updateStyle('--font-size', this.value + 'px')">
-          <button class="prevent-lose-focus" onclick="adjustStepper('fsInput', 0.5)">+</button>
+          <button type="button" onclick="adjustStepper('fsInput', 0.5)">+</button>
         </div>
 
         <div class="num-stepper" title="Giãn khoảng cách dòng">
           <span class="stepper-label">Dòng</span>
-          <button class="prevent-lose-focus" onclick="adjustStepper('lhInput', -0.05)">-</button>
+          <button type="button" onclick="adjustStepper('lhInput', -0.05)">-</button>
           <input type="number" id="lhInput" value="1.55" step="0.05" min="1.0" max="2.6" oninput="updateStyle('--line-height', this.value)">
-          <button class="prevent-lose-focus" onclick="adjustStepper('lhInput', 0.05)">+</button>
+          <button type="button" onclick="adjustStepper('lhInput', 0.05)">+</button>
         </div>
 
         <div class="num-stepper" title="Giãn khoảng cách chữ">
           <span class="stepper-label">Chữ</span>
-          <button class="prevent-lose-focus" onclick="adjustStepper('lsInput', -0.2)">-</button>
+          <button type="button" onclick="adjustStepper('lsInput', -0.2)">-</button>
           <input type="number" id="lsInput" value="0" step="0.1" min="-1" max="4" oninput="updateStyle('--letter-spacing', this.value + 'px')">
-          <button class="prevent-lose-focus" onclick="adjustStepper('lsInput', 0.2)">+</button>
+          <button type="button" onclick="adjustStepper('lsInput', 0.2)">+</button>
         </div>
 
         <div class="num-stepper" title="Thụt lề đầu đoạn">
           <span class="stepper-label">Lề</span>
-          <button class="prevent-lose-focus" onclick="adjustStepper('tiInput', -0.2)">-</button>
+          <button type="button" onclick="adjustStepper('tiInput', -0.2)">-</button>
           <input type="number" id="tiInput" value="1.6" step="0.2" min="0" max="4" oninput="updateStyle('--text-indent', this.value + 'em')">
-          <button class="prevent-lose-focus" onclick="adjustStepper('tiInput', 0.2)">+</button>
+          <button type="button" onclick="adjustStepper('tiInput', 0.2)">+</button>
         </div>
       </div>
 
@@ -653,37 +656,37 @@
       <div class="toolbar-group">
         <div class="num-stepper" title="Mực lem xơ giấy">
           <span class="stepper-label">Lem</span>
-          <button class="prevent-lose-focus" onclick="adjustStepper('bleedSlider', -0.2); applyAllTextEffects();">-</button>
+          <button type="button" onclick="adjustStepper('bleedSlider', -0.2)">-</button>
           <input type="number" id="bleedSlider" value="0" step="0.2" min="0" max="4" oninput="applyAllTextEffects()">
-          <button class="prevent-lose-focus" onclick="adjustStepper('bleedSlider', 0.2); applyAllTextEffects();">+</button>
+          <button type="button" onclick="adjustStepper('bleedSlider', 0.2)">+</button>
         </div>
 
         <div class="num-stepper" title="Độ đổ bóng">
           <span class="stepper-label">Bóng</span>
-          <button class="prevent-lose-focus" onclick="adjustStepper('shadowSlider', -0.2); applyAllTextEffects();">-</button>
+          <button type="button" onclick="adjustStepper('shadowSlider', -0.2)">-</button>
           <input type="number" id="shadowSlider" value="0" step="0.2" min="0" max="5" oninput="applyAllTextEffects()">
-          <button class="prevent-lose-focus" onclick="adjustStepper('shadowSlider', 0.2); applyAllTextEffects();">+</button>
+          <button type="button" onclick="adjustStepper('shadowSlider', 0.2)">+</button>
         </div>
 
         <div class="num-stepper" title="Mực ướt đẫm">
           <span class="stepper-label">Ướt</span>
-          <button class="prevent-lose-focus" onclick="adjustStepper('wetSlider', -0.2); applyAllTextEffects();">-</button>
+          <button type="button" onclick="adjustStepper('wetSlider', -0.2)">-</button>
           <input type="number" id="wetSlider" value="0" step="0.2" min="0" max="5" oninput="applyAllTextEffects()">
-          <button class="prevent-lose-focus" onclick="adjustStepper('wetSlider', 0.2); applyAllTextEffects();">+</button>
+          <button type="button" onclick="adjustStepper('wetSlider', 0.2)">+</button>
         </div>
 
         <div class="num-stepper" title="Chữ dập chìm">
           <span class="stepper-label">Ép</span>
-          <button class="prevent-lose-focus" onclick="adjustStepper('pressSlider', -0.2); applyAllTextEffects();">-</button>
+          <button type="button" onclick="adjustStepper('pressSlider', -0.2)">-</button>
           <input type="number" id="pressSlider" value="0" step="0.2" min="0" max="5" oninput="applyAllTextEffects()">
-          <button class="prevent-lose-focus" onclick="adjustStepper('pressSlider', 0.2); applyAllTextEffects();">+</button>
+          <button type="button" onclick="adjustStepper('pressSlider', 0.2)">+</button>
         </div>
 
         <div class="num-stepper" title="Hào quang sáng quanh chữ">
           <span class="stepper-label">Quang</span>
-          <button class="prevent-lose-focus" onclick="adjustStepper('glowSlider', -1); applyAllTextEffects();">-</button>
+          <button type="button" onclick="adjustStepper('glowSlider', -1)">-</button>
           <input type="number" id="glowSlider" value="0" step="1" min="0" max="20" oninput="applyAllTextEffects()">
-          <button class="prevent-lose-focus" onclick="adjustStepper('glowSlider', 1); applyAllTextEffects();">+</button>
+          <button type="button" onclick="adjustStepper('glowSlider', 1)">+</button>
         </div>
       </div>
 
@@ -693,7 +696,7 @@
         <label title="Hạt giấy">Hạt:<input type="range" min="0" max="0.1" step="0.01" value="0.045" oninput="updateStyle('--grain-opacity', this.value)" style="width:42px;height:5px;cursor:ew-resize;"></label>
         <label title="Đổi màu nền">Nền:<input type="color" id="bgPicker" value="#f7f4ec" onchange="setCustomBg(this.value)"></label>
         <label title="Đổi màu chữ">Chữ:<input type="color" id="textPicker" value="#1c1b1a" onchange="setCustomText(this.value)"></label>
-        <button onclick="setCustomText('#263b72')" style="color: #2563eb; font-weight: bold;">#263b72</button>
+        <button type="button" onclick="setCustomText('#263b72')" style="color: #2563eb; font-weight: bold;">#263b72</button>
         
         <select id="fontSelect" onchange="changeFont(this.value)">
           <option value="font-alegreya">Alegreya (Thơ mộng)</option>
@@ -709,18 +712,18 @@
 
       <!-- Nhóm 6: Căn lề & Highlight -->
       <div class="toolbar-group">
-        <button class="btn-icon prevent-lose-focus" onclick="formatDoc('justifyFull')" title="Căn đều">≡</button>
-        <button class="btn-icon prevent-lose-focus" onclick="formatDoc('justifyCenter')" title="Căn giữa">≗</button>
-        <button class="btn-icon prevent-lose-focus" onclick="formatDoc('justifyLeft')" title="Căn trái">⇥</button>
-        <button class="btn-icon prevent-lose-focus" onclick="insertSceneBreak()" title="Phân cảnh">⁂</button>
+        <button type="button" class="btn-icon" onclick="formatDoc('justifyFull')" title="Căn đều">≡</button>
+        <button type="button" class="btn-icon" onclick="formatDoc('justifyCenter')" title="Căn giữa">≗</button>
+        <button type="button" class="btn-icon" onclick="formatDoc('justifyLeft')" title="Căn trái">⇥</button>
+        <button type="button" class="btn-icon" onclick="insertSceneBreak()" title="Phân cảnh">⁂</button>
         
-        <button class="prevent-lose-focus" onclick="toggleFormatSpan('hl-yellow')">Vàng</button>
-        <button class="prevent-lose-focus" onclick="toggleFormatSpan('hl-gray')">Xám</button>
-        <button class="prevent-lose-focus" onclick="toggleFormatSpan('pencil-underline')">〰 Gạch đỏ</button>
-        <button class="prevent-lose-focus" onclick="clearHighlightFormatting()" title="Xóa toàn bộ màu Highlight & Gạch đỏ" style="background: #fee2e2; border-color: #fca5a5; color: #dc2626; font-weight: bold;">🧹 Xóa màu</button>
+        <button type="button" onclick="toggleFormatSpan('hl-yellow')">Vàng</button>
+        <button type="button" onclick="toggleFormatSpan('hl-gray')">Xám</button>
+        <button type="button" onclick="toggleFormatSpan('pencil-underline')">〰 Gạch đỏ</button>
+        <button type="button" onclick="clearHighlightFormatting()" title="Xóa toàn bộ màu Highlight & Gạch đỏ" style="background: #fee2e2; border-color: #fca5a5; color: #dc2626; font-weight: bold;">🧹 Xóa màu</button>
         
-        <button class="prevent-lose-focus" onclick="insertFootnoteMark()">Chú thích (¹)</button>
-        <button class="prevent-lose-focus" onclick="applyDropCap()">🔤 DropCap</button>
+        <button type="button" onclick="insertFootnoteMark()">Chú thích (¹)</button>
+        <button type="button" onclick="applyDropCap()">🔤 DropCap</button>
       </div>
     </div>
   </div>
@@ -733,7 +736,7 @@
         <div class="stage-wrapper active-page" onclick="setActivePage(this)">
           <div class="page-control-bar">
             <span>TRANG 1</span>
-            <button class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
+            <button type="button" class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
           </div>
 
           <div class="book-wrapper">
@@ -805,11 +808,45 @@
     let pageCount = 1;
     let currentSkin = 'pastel';
 
+    // =========================================================================
+    // HỆ THỐNG LƯU GIỮ TỌA ĐỘ CON TRỎ & VÙNG BÔI ĐEN DÀNH RIÊNG CHO ĐIỆN THOẠI
+    // =========================================================================
+    let savedRange = null;
+    let lastEditableElement = null;
+
+    document.addEventListener('selectionchange', () => {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        let node = range.commonAncestorContainer;
+        if (node.nodeType === 3) node = node.parentElement;
+        // Chỉ lưu khi con trỏ đang nằm bên trong trang sách
+        if (node && node.closest('[contenteditable="true"]')) {
+          savedRange = range.cloneRange();
+          lastEditableElement = node.closest('[contenteditable="true"]');
+        }
+      }
+    });
+
+    // Khôi phục con trỏ trước khi thực thi bất kỳ lệnh định dạng nào trên điện thoại
+    function restoreSelection() {
+      if (lastEditableElement) {
+        lastEditableElement.focus();
+      }
+      if (savedRange) {
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(savedRange);
+      }
+    }
+
     function execUndo() {
+      restoreSelection();
       document.execCommand('undo', false, null);
     }
 
     function execRedo() {
+      restoreSelection();
       document.execCommand('redo', false, null);
     }
 
@@ -853,15 +890,12 @@
       }, { passive: false });
     }
 
-    document.querySelectorAll('.prevent-lose-focus').forEach(btn => {
-      btn.addEventListener('pointerdown', e => e.preventDefault());
-      btn.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
-    });
-
+    // HÀM BẤM NÚT - / + THÔNG SỐ (NHẠY 100% TRÊN CẢ ĐIỆN THOẠI & PC)
     function adjustStepper(id, delta) {
       const input = document.getElementById(id);
       if (!input) return;
-      let val = parseFloat(input.value) || 0;
+      let val = parseFloat(input.value);
+      if (isNaN(val)) val = 0;
       val = Math.round((val + delta) * 100) / 100;
       
       const min = input.min !== '' ? parseFloat(input.min) : -999;
@@ -869,7 +903,13 @@
       val = Math.min(Math.max(val, min), max);
       
       input.value = val;
-      input.dispatchEvent(new Event('input'));
+
+      // Gọi trực tiếp hàm cập nhật tương ứng để đảm bảo ăn ngay lập tức trên iOS/Android
+      if (id === 'fsInput') updateStyle('--font-size', val + 'px');
+      else if (id === 'lhInput') updateStyle('--line-height', val);
+      else if (id === 'lsInput') updateStyle('--letter-spacing', val + 'px');
+      else if (id === 'tiInput') updateStyle('--text-indent', val + 'em');
+      else applyAllTextEffects();
     }
 
     document.addEventListener('paste', function(e) {
@@ -881,8 +921,16 @@
       }
     });
 
+    // CHÈN TAB THỤT ĐẦU DÒNG TRÊN ĐIỆN THOẠI & PC
     function insertTabIndent() {
+      restoreSelection();
       document.execCommand('insertHTML', false, '&emsp;&emsp;');
+      // Cập nhật lại vị trí con trỏ mới sau khi chèn
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        savedRange = sel.getRangeAt(0).cloneRange();
+      }
+      autoSavePreset();
     }
 
     document.addEventListener('keydown', function(e) {
@@ -890,7 +938,7 @@
         const active = document.activeElement;
         if (active && active.isContentEditable) {
           e.preventDefault();
-          insertTabIndent();
+          document.execCommand('insertHTML', false, '&emsp;&emsp;');
         }
       }
     });
@@ -946,7 +994,7 @@
         <div class="stage-wrapper" onclick="setActivePage(this)">
           <div class="page-control-bar">
             <span>TRANG ${pageCount}</span>
-            <button class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
+            <button type="button" class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
           </div>
 
           <div class="book-wrapper">
@@ -1144,6 +1192,7 @@
     }
 
     function toggleFormatSpan(className) {
+      restoreSelection();
       const selection = window.getSelection();
       if (!selection.rangeCount) return;
 
@@ -1160,17 +1209,20 @@
         }
         parent.removeChild(targetSpan);
         selection.removeAllRanges();
+        savedRange = null;
       } else {
         if (selection.isCollapsed) return;
         const span = document.createElement("span");
         span.className = className;
         span.appendChild(range.extractContents());
         range.insertNode(span);
+        savedRange = range.cloneRange();
       }
       autoSavePreset();
     }
 
     function clearHighlightFormatting() {
+      restoreSelection();
       const selection = window.getSelection();
       if (!selection.rangeCount) return;
 
@@ -1299,7 +1351,7 @@
               <div class="stage-wrapper ${idx === 0 ? 'active-page' : ''}" onclick="setActivePage(this)">
                 <div class="page-control-bar">
                   <span>TRANG ${pageCount}</span>
-                  <button class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
+                  <button type="button" class="btn-delete-page" onclick="deletePage(event, this)">🗑️ Xóa trang</button>
                 </div>
                 <div class="book-wrapper">
                   ${pData.html}
@@ -1313,8 +1365,17 @@
       } catch (e) {}
     }
 
-    function formatDoc(cmd) { document.execCommand(cmd, false, null); }
-    function insertSceneBreak() { document.execCommand('insertHTML', false, '<p class="scene-break">* * *</p><p><br></p>'); }
+    function formatDoc(cmd) {
+      restoreSelection();
+      document.execCommand(cmd, false, null);
+      autoSavePreset();
+    }
+
+    function insertSceneBreak() {
+      restoreSelection();
+      document.execCommand('insertHTML', false, '<p class="scene-break">* * *</p><p><br></p>');
+      autoSavePreset();
+    }
 
     function toSuperscript(str) {
       const map = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹' };
@@ -1324,6 +1385,8 @@
     function insertFootnoteMark() {
       const input = prompt("Nhập số chú thích:", nextFootnoteNumber);
       if (input === null || input.trim() === "") return;
+      
+      restoreSelection();
       const supText = toSuperscript(input.trim());
       document.execCommand("insertText", false, supText);
 
@@ -1336,11 +1399,16 @@
       }
       const parsed = parseInt(input.trim(), 10);
       if (!isNaN(parsed)) nextFootnoteNumber = parsed + 1;
+      autoSavePreset();
     }
 
     function applyDropCap() {
+      restoreSelection();
       const selection = window.getSelection();
-      if (!selection.rangeCount || selection.isCollapsed) return;
+      if (!selection.rangeCount || selection.isCollapsed) {
+        alert("Bà hãy bôi đen 1 chữ cái đầu dòng rồi bấm nút nhé!");
+        return;
+      }
       const range = selection.getRangeAt(0);
       const span = document.createElement("span");
       span.className = "dropcap";
@@ -1348,6 +1416,7 @@
       range.insertNode(span);
       let parentP = span.closest('p');
       if (parentP) parentP.classList.add('has-dropcap');
+      autoSavePreset();
     }
 
     async function renderPageToCanvas(pageEl) {
