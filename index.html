@@ -28,7 +28,6 @@
 
   <style>
     :root {
-      /* Theme Pastel Blue (Mặc định) */
       --ui-bg: #eaf2f8;
       --ui-toolbar-bg: rgba(255, 255, 255, 0.85);
       --ui-border: #cfe0ee;
@@ -147,7 +146,7 @@
       outline: none;
       transition: all 0.15s ease;
       flex-shrink: 0;
-      touch-action: manipulation; /* Tăng tốc độ phản hồi cảm ứng trên điện thoại */
+      touch-action: manipulation;
     }
 
     .toolbar button:active {
@@ -278,7 +277,6 @@
       transform-origin: top center;
       display: flex;
       justify-content: center;
-      transition: transform 0.1s ease-out;
       width: 100%;
     }
 
@@ -621,7 +619,7 @@
         <button onclick="insertTabIndent()" title="Thụt đầu dòng chuẩn sách" style="font-weight: bold;">⇥ Tab</button>
       </div>
 
-      <!-- Nhóm 3: Cỡ chữ & Giãn dòng (ĐÃ MỞ KHÓA CẢM ỨNG 100%) -->
+      <!-- Nhóm 3: Cỡ chữ & Giãn dòng -->
       <div class="toolbar-group">
         <div class="num-stepper" title="Cỡ chữ">
           <span class="stepper-label">Cỡ</span>
@@ -808,9 +806,6 @@
     let pageCount = 1;
     let currentSkin = 'pastel';
 
-    // =========================================================================
-    // HỆ THỐNG LƯU GIỮ TỌA ĐỘ CON TRỎ & VÙNG BÔI ĐEN DÀNH RIÊNG CHO ĐIỆN THOẠI
-    // =========================================================================
     let savedRange = null;
     let lastEditableElement = null;
 
@@ -820,7 +815,6 @@
         const range = sel.getRangeAt(0);
         let node = range.commonAncestorContainer;
         if (node.nodeType === 3) node = node.parentElement;
-        // Chỉ lưu khi con trỏ đang nằm bên trong trang sách
         if (node && node.closest('[contenteditable="true"]')) {
           savedRange = range.cloneRange();
           lastEditableElement = node.closest('[contenteditable="true"]');
@@ -828,7 +822,6 @@
       }
     });
 
-    // Khôi phục con trỏ trước khi thực thi bất kỳ lệnh định dạng nào trên điện thoại
     function restoreSelection() {
       if (lastEditableElement) {
         lastEditableElement.focus();
@@ -890,7 +883,6 @@
       }, { passive: false });
     }
 
-    // HÀM BẤM NÚT - / + THÔNG SỐ (NHẠY 100% TRÊN CẢ ĐIỆN THOẠI & PC)
     function adjustStepper(id, delta) {
       const input = document.getElementById(id);
       if (!input) return;
@@ -904,7 +896,6 @@
       
       input.value = val;
 
-      // Gọi trực tiếp hàm cập nhật tương ứng để đảm bảo ăn ngay lập tức trên iOS/Android
       if (id === 'fsInput') updateStyle('--font-size', val + 'px');
       else if (id === 'lhInput') updateStyle('--line-height', val);
       else if (id === 'lsInput') updateStyle('--letter-spacing', val + 'px');
@@ -921,11 +912,9 @@
       }
     });
 
-    // CHÈN TAB THỤT ĐẦU DÒNG TRÊN ĐIỆN THOẠI & PC
     function insertTabIndent() {
       restoreSelection();
       document.execCommand('insertHTML', false, '&emsp;&emsp;');
-      // Cập nhật lại vị trí con trỏ mới sau khi chèn
       const sel = window.getSelection();
       if (sel && sel.rangeCount > 0) {
         savedRange = sel.getRangeAt(0).cloneRange();
@@ -1419,18 +1408,28 @@
       autoSavePreset();
     }
 
+    // =========================================================================
+    // KẾT XUẤT ẢNH 4K: CHUẨN TỌA ĐỘ HIGHLIGHT TRÊN MỌI MÀN HÌNH ĐIỆN THOẠI
+    // =========================================================================
     async function renderPageToCanvas(pageEl) {
       const sandbox = pageEl.closest('.scale-sandbox');
       const prevTransform = sandbox.style.transform;
       const prevMargin = sandbox.style.marginBottom;
+      const prevTransition = sandbox.style.transition;
       
+      // Tắt transition để đưa về kích thước 1:1 ngay tức khắc (0ms)
+      sandbox.style.transition = 'none';
       sandbox.style.transform = 'none';
       sandbox.style.marginBottom = '0px';
+      void pageEl.offsetWidth; // Ép trình duyệt cập nhật layout đồng bộ ngay lập tức
 
       const hadSpine = pageEl.classList.contains('has-spine');
       pageEl.classList.remove('has-spine');
 
       const pageRect = pageEl.getBoundingClientRect();
+      const scaleX = (pageRect.width / pageEl.offsetWidth) || 1;
+      const scaleY = (pageRect.height / pageEl.offsetHeight) || 1;
+
       const highlightSpans = pageEl.querySelectorAll('.hl-yellow, .hl-gray');
       const tempBgElements = [];
       const modifiedSpans = [];
@@ -1448,12 +1447,18 @@
           for (let i = 0; i < rects.length; i++) {
             const r = rects[i];
             if (r.width <= 0 || r.height <= 0) continue;
+
+            const left = (r.left - pageRect.left) / scaleX;
+            const top = (r.top - pageRect.top) / scaleY;
+            const width = r.width / scaleX;
+            const height = r.height / scaleY;
+
             const bgDiv = document.createElement('div');
             bgDiv.className = 'temp-hl-bg';
-            bgDiv.style.left = (r.left - pageRect.left - 2) + 'px';
-            bgDiv.style.top = (r.top - pageRect.top - 1) + 'px';
-            bgDiv.style.width = (r.width + 4) + 'px';
-            bgDiv.style.height = (r.height + 2) + 'px';
+            bgDiv.style.left = (left - 2) + 'px';
+            bgDiv.style.top = (top - 1) + 'px';
+            bgDiv.style.width = (width + 4) + 'px';
+            bgDiv.style.height = (height + 2) + 'px';
             bgDiv.style.backgroundColor = bgColor;
             pageEl.appendChild(bgDiv);
             tempBgElements.push(bgDiv);
@@ -1474,8 +1479,12 @@
 
       tempBgElements.forEach(el => el.remove());
       modifiedSpans.forEach(item => item.span.style.backgroundColor = item.origBg);
+      
       sandbox.style.transform = prevTransform;
       sandbox.style.marginBottom = prevMargin;
+      void pageEl.offsetWidth;
+      sandbox.style.transition = prevTransition;
+
       if (hadSpine && currentMode === 'page') pageEl.classList.add('has-spine');
 
       let finalCanvas = canvas;
